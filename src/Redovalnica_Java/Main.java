@@ -3,15 +3,14 @@ package Redovalnica_Java;
 import java.sql.SQLException;
 
 public class Main {
-    /* dela
        public static void main(String[] args) {
         try {
             RedovalnicaDatabase rd = new RedovalnicaDatabase();
-            for (Ucenec item : rd.ReturnVseUcence()) {
-                System.out.println(item.Ime + ' ' + item.Priimek);
+            for (Razred item : rd.ReturnVseRazrede()) {
+                System.out.println(item.ImeR);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }*/
+    }
 }
