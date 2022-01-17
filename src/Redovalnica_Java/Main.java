@@ -6,8 +6,8 @@ public class Main {
        public static void main(String[] args) {
         try {
             RedovalnicaDatabase rd = new RedovalnicaDatabase();
-            for (Razred item : rd.ReturnVseRazrede()) {
-                System.out.println(item.ImeR);
+            for (Solsko_Leto item : rd.ReturnVsaSolskaLeta()) {
+                System.out.println(item.SLeto);
             }
         } catch (SQLException e) {
             e.printStackTrace();
