@@ -33,6 +33,26 @@ public class RedovalnicaDatabase {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        return  ucenci;
+        return ucenci;
+    }
+    public ArrayList<Razred> ReturnVseRazrede(){
+        ArrayList<Razred> razredi = new ArrayList<>();
+        try(newConn){
+            Statement stmt = newConn.createStatement();
+            String sql = "SELECT razred FROM razredi";
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while(rs.next()) {
+                String razred = rs.getString("razred");
+
+                Razred uc = new Razred(razred);
+                razredi.add(uc);
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return razredi;
     }
 }
