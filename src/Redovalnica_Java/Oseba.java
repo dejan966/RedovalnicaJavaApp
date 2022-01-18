@@ -267,4 +267,3 @@ class Prisotnost extends UreIzvedbe{
         Opomba = opomba;
     }
 }
-

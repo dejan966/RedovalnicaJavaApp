@@ -6,9 +6,9 @@ public class Main {
        public static void main(String[] args) {
         try {
             RedovalnicaDatabase rd = new RedovalnicaDatabase();
-            for (Solsko_Leto item : rd.ReturnVsaSolskaLeta()) {
-                System.out.println(item.SLeto);
-            }
+            Ucitelj uc = new Ucitelj("zan.gozdni@scv.si");
+            String sd = rd.ReturnImePriimekUcitelja(uc);
+            System.out.println(sd);
         } catch (SQLException e) {
             e.printStackTrace();
         }

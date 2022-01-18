@@ -14,6 +14,39 @@ public class RedovalnicaDatabase {
         conn = DriverManager.getConnection(jdbcURL, username, password);
         newConn = conn;
     }
+    public Boolean PreveriPrijavo(Ucitelj uc)
+    {
+        try(newConn){
+            Statement stmt = newConn.createStatement();
+            String sql = "SELECT solski_email, geslo FROM ucitelji WHERE(solski_email = '" + uc.SolskiEmail + "') AND (geslo = '" + uc.Geslo + "');";
+            ResultSet rs = stmt.executeQuery(sql);
+            //prever če ma rowe in ce nima vrn false
+            rs.close();
+            stmt.close();
+        }
+        catch (SQLException throwables){
+            throwables.printStackTrace();
+        }
+        return true;
+    }
+    public String ReturnImePriimekUcitelja(Ucitelj email)
+    {
+        String ime_priimek = "";
+        try(newConn){
+            Statement stmt = newConn.createStatement();
+            String sql = "SELECT o.ime || ' ' || o.priimek AS ucitelj FROM osebe o INNER JOIN ucitelji u ON u.id_osebe = o.id_osebe WHERE (u.solski_email = '" + email.SolskiEmail + "');";
+            ResultSet rs = stmt.executeQuery(sql);
+            while(rs.next())
+                ime_priimek = rs.getString(1);
+
+            rs.close();
+            stmt.close();
+        }
+        catch (SQLException throwables){
+            throwables.printStackTrace();
+        }
+        return ime_priimek;
+    }
     public ArrayList<Ucenec> ReturnVseUcence(){
         ArrayList<Ucenec> ucenci = new ArrayList<>();
         try(newConn){
@@ -134,5 +167,276 @@ public class RedovalnicaDatabase {
             throwables.printStackTrace();
         }
         return vrste_ur;
+    }
+
+    public ArrayList<Ucenec> ReturnUcenci_Razred(Razred ru){
+        ArrayList<Ucenec> ucenci = new ArrayList<>();
+        try(newConn){
+            Statement stmt = newConn.createStatement();
+            String sql = "SELECT o.ime, o.priimek FROM osebe o INNER JOIN ucenci u ON u.id_osebe = o.id_osebe INNER JOIN razredi r ON u.id_razredi = r.id_razredi INNER JOIN solska_leta sl on sl.id_solska_leta = r.id_solska_leta WHERE(r.razred = '" + ru.ImeR + "') AND (sl.solsko_leto = '" + ru.SLeto + "')";
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while(rs.next()) {
+                String ime = rs.getString("ime");
+                String priimek = rs.getString("priimek");
+
+                Ucenec uc = new Ucenec(ime, priimek);
+                ucenci.add(uc);
+            }
+            /*
+            else
+                {
+                    Ucenec u = new Ucenec("", "");
+                    ucenci.Add(u);
+                }
+             */
+            rs.close();
+            stmt.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return ucenci;
+    }
+    public ArrayList<Razred> ReturnRazred_SolskoLeto(Solsko_Leto s){
+        ArrayList<Razred> razrediS = new ArrayList<>();
+        try(newConn){
+            Statement stmt = newConn.createStatement();
+            String sql = "SELECT r.razred FROM razredi r INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta WHERE (sl.solsko_leto = '" + s.SLeto + "')";
+            ResultSet rs = stmt.executeQuery(sql);
+            while(rs.next()) {
+                String razred = rs.getString("razred");
+
+                Razred r = new Razred(razred);
+                razrediS.add(r);
+            }
+            /*
+            else
+                {
+                    Razred u = new Razred("");
+                    razredi.Add(u);
+                }
+             */
+            rs.close();
+            stmt.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return razrediS;
+    }
+    public ArrayList<Ocena> ReturnRazredUcenciOcena(RazredPredmet prs){
+        ArrayList<Ocena> ocene = new ArrayList<>();
+        try(newConn){
+            Statement stmt = newConn.createStatement();
+            String sql = "SELECT DISTINCT o.ime || ' ' || o.priimek AS ucenec, oc.ocena_st, p.predmet FROM osebe o INNER JOIN ucenci u on o.id_osebe = u.id_osebe INNER JOIN razredi r on r.id_razredi = u.id_razredi INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta INNER JOIN razredi_predmeti rp on r.id_razredi = rp.id_razredi INNER JOIN ocene_ucenci ou on rp.id_razredi_predmeti = ou.id_razredi_predmeti INNER JOIN ocene_ucenci ou2 on u.id_ucenci = ou2.id_ucenci INNER JOIN predmeti p on p.id_predmeti = rp.id_predmeti INNER JOIN ocene oc on oc.id_ocene = ou.id_ocene WHERE (sl.solsko_leto = '" + prs.SLeto + "') AND (r.razred = '" + prs.ImeR + "')";
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while(rs.next()) {
+                String ucenec = rs.getString(0);
+                int stO = rs.getInt(1);
+
+                Ocena oc = new Ocena(ucenec, stO);
+                ocene.add(oc);
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return ocene;
+    }
+    public void InsertOcena_Ucenec(Ocena ocenaZaUcenca)
+    {
+        try (newConn)
+        {
+            Statement stmt = newConn.createStatement();
+            String sql = "INSERT INTO ocene_ucenci(id_ucenci, id_ocene, datum, id_razredi_predmeti) VALUES ((SELECT id_ucenci FROM ucenci WHERE (id_osebe = (SELECT id_osebe FROM osebe WHERE ime || ' ' || priimek = '" + ocenaZaUcenca.Ucenec + "'))), (SELECT id_ocene FROM ocene WHERE ocena_st = '" + ocenaZaUcenca.UOcena + "'), '" + ocenaZaUcenca.DatumOcena + "', (SELECT rp.id_razredi_predmeti FROM razredi_predmeti rp INNER JOIN razredi r ON r.id_razredi = rp.id_razredi INNER JOIN predmeti p ON rp.id_predmeti = p.id_predmeti INNER JOIN ucitelji u ON u.id_ucitelji = rp.id_ucitelji INNER JOIN osebe o ON o.id_osebe = u.id_osebe WHERE (r.razred = '" + ocenaZaUcenca.ImeR + "') AND (p.predmet = '" + ocenaZaUcenca.ImeP + "') AND (o.ime || ' ' || o.priimek = '" + ocenaZaUcenca.UciteljP + "')))";
+            stmt.executeUpdate(sql);
+            stmt.close();
+        }
+        catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+    public void InsertRazrediPredmeti(RazredPredmet rp)
+    {
+        try(newConn){
+            Statement stmt = newConn.createStatement();
+            String sql = "SELECT p.predmet, r.razred, o.ime || ' ' || o.priimek FROM osebe o INNER JOIN ucitelji u on o.id_osebe = u.id_osebe INNER JOIN razredi_predmeti rp on u.id_ucitelji = rp.id_ucitelji INNER JOIN razredi r on rp.id_razredi = r.id_razredi INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta INNER JOIN predmeti p on rp.id_predmeti = p.id_predmeti WHERE (p.predmet = '\" + rp.ImeP + \"') AND (r.razred = '\" + rp.ImeR + \"') AND (sl.solsko_leto = '\" + rp.SLeto + \"') AND (ime || ' ' || priimek = '\" + rp.UciteljP + \"')";
+            ResultSet rs = stmt.executeQuery(sql);
+            if(!rs.next()){
+                final Connection newConn2 = DriverManager.getConnection(jdbcURL, username, password);
+                Statement stmt2 = newConn2.createStatement();
+                String sql2 = "INSERT INTO razredi_predmeti (id_predmeti, id_razredi, id_ucitelji) VALUES ((SELECT id_predmeti FROM predmeti WHERE predmet = '" + rp.ImeP + "'), (SELECT r.id_razredi FROM razredi r INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta WHERE (r.razred = '" + rp.ImeR + "') AND (sl.solsko_leto = '" + rp.SLeto + "')), (SELECT id_ucitelji FROM ucitelji WHERE (id_osebe = (SELECT id_osebe FROM osebe WHERE ime || ' ' || priimek = '" + rp.UciteljP + "'))));";
+                stmt2.executeUpdate(sql2);
+                stmt2.close();
+            }
+            rs.close();
+            stmt.close();
+        }
+        catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+    public int IDRazrediPredmeti(RazredPredmet rp)
+    {
+        int id = 1;
+        try(newConn){
+            Statement stmt = newConn.createStatement();
+            String sql = "SELECT id_razredi_predmeti FROM razredi_predmeti WHERE (id_predmeti = (SELECT id_predmeti FROM predmeti WHERE predmet = '" + rp.ImeP + "')) AND (id_razredi = (SELECT r.id_razredi FROM razredi r INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta WHERE (r.razred = '\" + rp.ImeR + \"') AND (sl.solsko_leto = '" + rp.SLeto + "'))) AND (id_ucitelji = (SELECT id_ucitelji FROM ucitelji WHERE (id_osebe = (SELECT id_osebe FROM osebe WHERE ime || ' ' || priimek = '" + rp.UciteljP + "'))));";
+            ResultSet rs = stmt.executeQuery(sql);
+            while(!rs.next()){
+                id = rs.getInt(0);
+            }
+            rs.close();
+            stmt.close();
+        }
+        catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return id;
+    }
+    public void InsertUreIzvedb(UreIzvedbe ure)
+    {
+        try(newConn){
+            Statement stmt = newConn.createStatement();
+            String sql = "INSERT INTO ure_izvedb(id_razredi_predmeti, id_vrste_ur, datum_cas) VALUES ('" + ure.Id_R_P_U + "', (SELECT id_vrste_ur FROM vrste_ur WHERE vrsta_ure = '" + ure.VrstaUre + "'), '" + ure.DatumCas + "');";
+            stmt.executeUpdate(sql);
+            stmt.close();
+        }
+        catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+    public int IDUreIzvedb(UreIzvedbe ure){
+        int id = 1;
+        try(newConn){
+            Statement stmt = newConn.createStatement();
+            String sql = "SELECT id_ure_izvedb FROM ure_izvedb WHERE (id_razredi_predmeti = '" + ure.Id_R_P_U + "') AND (id_vrste_ur = (SELECT id_vrste_ur FROM vrste_ur WHERE vrsta_ure = '" + ure.VrstaUre + "')) AND (datum_cas LIKE '%" + ure.DatumCas + "%');";
+            ResultSet rs = stmt.executeQuery(sql);
+            while(rs.next()){
+                id = rs.getInt(0);
+            }
+            rs.close();
+            stmt.close();
+        }
+        catch (SQLException throwables){
+            throwables.printStackTrace();
+        }
+        return id;
+    }
+    public void InsertPrisotnosti(Prisotnost dPrisotnost)
+    {
+        try(newConn)
+        {
+            Statement stmt = newConn.createStatement();
+            String sql = "INSERT INTO prisotnosti(id_ucenci, id_ure_izvedb, opomba) VALUES((SELECT id_ucenci FROM ucenci WHERE (id_osebe = (SELECT id_osebe FROM osebe WHERE ime || ' ' || priimek = '" + dPrisotnost.Ucenec + "'))), '" + dPrisotnost.Id_Ure_Izvedbe + "', '" + dPrisotnost.Opomba + "')";
+            stmt.executeUpdate(sql);
+            stmt.close();
+        }
+        catch (SQLException throwables){
+            throwables.printStackTrace();
+        }
+    }
+    public int Return_StUcenci_Razred(Razred r){
+        int st_ucencevR = 0;
+        try(newConn){
+            Statement stmt = newConn.createStatement();
+            String sql = "SELECT COUNT(u.*) FROM ucenci u INNER JOIN razredi r ON r.id_razredi = u.id_razredi INNER JOIN solska_leta sl ON r.id_solska_leta = sl.id_solska_leta WHERE(sl.solsko_leto = '" + r.SLeto + "') AND (r.razred = '" + r.ImeR + "')";
+            ResultSet rs = stmt.executeQuery(sql);
+            while(rs.next()){
+                st_ucencevR = rs.getInt(0);
+            }
+            rs.close();
+            stmt.close();
+        }
+        catch (SQLException throwables){
+            throwables.printStackTrace();
+        }
+        return st_ucencevR;
+    }
+    public int Return_Ucenci_Ocena1(RazredPredmet r1)
+    {
+        int st_ucencev1 = 0;
+        try(newConn){
+            Statement stmt = newConn.createStatement();
+            String sql = "SELECT COUNT(u.*) FROM ucenci u INNER JOIN ocene_ucenci ou ON ou.id_ucenci = u.id_ucenci INNER JOIN ocene o ON o.id_ocene = ou.id_ocene INNER JOIN razredi_predmeti rp ON rp.id_razredi_predmeti = ou.id_razredi_predmeti INNER JOIN razredi r ON r.id_razredi = rp.id_razredi INNER JOIN solska_leta sl ON r.id_solska_leta = sl.id_solska_leta INNER JOIN predmeti p ON rp.id_predmeti = p.id_predmeti WHERE(o.ocena_st = 1) AND (sl.solsko_leto = '" + r1.SLeto + "') AND (r.razred = '" + r1.ImeR + "') AND (p.predmet = '" + r1.ImeP + "')";
+            ResultSet rs = stmt.executeQuery(sql);
+            if(rs.next()){
+                while(rs.next())
+                    st_ucencev1 = rs.getInt(0);
+            }
+        }
+        catch (SQLException throwables){
+            throwables.printStackTrace();
+        }
+        return st_ucencev1;
+    }
+    public int Return_Ucenci_Ocena2(RazredPredmet r2)
+    {
+        int st_ucencev2 = 0;
+        try(newConn){
+            Statement stmt = newConn.createStatement();
+            String sql = "SELECT COUNT(u.*) FROM ucenci u INNER JOIN ocene_ucenci ou ON ou.id_ucenci = u.id_ucenci INNER JOIN ocene o ON o.id_ocene = ou.id_ocene INNER JOIN razredi_predmeti rp ON rp.id_razredi_predmeti = ou.id_razredi_predmeti INNER JOIN razredi r ON r.id_razredi = rp.id_razredi INNER JOIN solska_leta sl ON r.id_solska_leta = sl.id_solska_leta INNER JOIN predmeti p ON rp.id_predmeti = p.id_predmeti WHERE(o.ocena_st = 2) AND (sl.solsko_leto = '" + r2.SLeto + "') AND (r.razred = '" + r2.ImeR + "') AND (p.predmet = '" + r2.ImeP + "')";
+            ResultSet rs = stmt.executeQuery(sql);
+            if(rs.next()){
+                while(rs.next())
+                    st_ucencev2 = rs.getInt(0);
+            }
+        }
+        catch (SQLException throwables){
+            throwables.printStackTrace();
+        }
+        return st_ucencev2;
+    }
+    public int Return_Ucenci_Ocena3(RazredPredmet r3)
+    {
+        int st_ucencev3 = 0;
+        try(newConn){
+            Statement stmt = newConn.createStatement();
+            String sql = "SELECT COUNT(u.*) FROM ucenci u INNER JOIN ocene_ucenci ou ON ou.id_ucenci = u.id_ucenci INNER JOIN ocene o ON o.id_ocene = ou.id_ocene INNER JOIN razredi_predmeti rp ON rp.id_razredi_predmeti = ou.id_razredi_predmeti INNER JOIN razredi r ON r.id_razredi = rp.id_razredi INNER JOIN solska_leta sl ON r.id_solska_leta = sl.id_solska_leta INNER JOIN predmeti p ON rp.id_predmeti = p.id_predmeti WHERE(o.ocena_st = 3) AND (sl.solsko_leto = '" + r3.SLeto + "') AND (r.razred = '" + r3.ImeR + "') AND (p.predmet = '" + r3.ImeP + "')";
+            ResultSet rs = stmt.executeQuery(sql);
+            if(rs.next()){
+                while(rs.next())
+                    st_ucencev3 = rs.getInt(0);
+            }
+        }
+        catch (SQLException throwables){
+            throwables.printStackTrace();
+        }
+        return st_ucencev3;
+    }
+    public int Return_Ucenci_Ocena4(RazredPredmet r4)
+    {
+        int st_ucencev4 = 0;
+        try(newConn){
+            Statement stmt = newConn.createStatement();
+            String sql = "SELECT COUNT(u.*) FROM ucenci u INNER JOIN ocene_ucenci ou ON ou.id_ucenci = u.id_ucenci INNER JOIN ocene o ON o.id_ocene = ou.id_ocene INNER JOIN razredi_predmeti rp ON rp.id_razredi_predmeti = ou.id_razredi_predmeti INNER JOIN razredi r ON r.id_razredi = rp.id_razredi INNER JOIN solska_leta sl ON r.id_solska_leta = sl.id_solska_leta INNER JOIN predmeti p ON rp.id_predmeti = p.id_predmeti WHERE(o.ocena_st = 4) AND (sl.solsko_leto = '" + r4.SLeto + "') AND (r.razred = '" + r4.ImeR + "') AND (p.predmet = '" + r4.ImeP + "')";
+            ResultSet rs = stmt.executeQuery(sql);
+            if(rs.next()){
+                while(rs.next())
+                    st_ucencev4 = rs.getInt(0);
+            }
+        }
+        catch (SQLException throwables){
+            throwables.printStackTrace();
+        }
+        return st_ucencev4;
+    }
+    public int Return_Ucenci_Ocena5(RazredPredmet r5)
+    {
+        int st_ucencev5 = 0;
+        try(newConn){
+            Statement stmt = newConn.createStatement();
+            String sql = "SELECT COUNT(u.*) FROM ucenci u INNER JOIN ocene_ucenci ou ON ou.id_ucenci = u.id_ucenci INNER JOIN ocene o ON o.id_ocene = ou.id_ocene INNER JOIN razredi_predmeti rp ON rp.id_razredi_predmeti = ou.id_razredi_predmeti INNER JOIN razredi r ON r.id_razredi = rp.id_razredi INNER JOIN solska_leta sl ON r.id_solska_leta = sl.id_solska_leta INNER JOIN predmeti p ON rp.id_predmeti = p.id_predmeti WHERE(o.ocena_st = 5) AND (sl.solsko_leto = '" + r5.SLeto + "') AND (r.razred = '" + r5.ImeR + "') AND (p.predmet = '" + r5.ImeP + "')";
+            ResultSet rs = stmt.executeQuery(sql);
+            if(rs.next()){
+                while(rs.next())
+                    st_ucencev5 = rs.getInt(0);
+            }
+        }
+        catch (SQLException throwables){
+            throwables.printStackTrace();
+        }
+        return st_ucencev5;
     }
 }
