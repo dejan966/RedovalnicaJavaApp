@@ -20,7 +20,9 @@ public class RedovalnicaDatabase {
             Statement stmt = newConn.createStatement();
             String sql = "SELECT solski_email, geslo FROM ucitelji WHERE(solski_email = '" + uc.SolskiEmail + "') AND (geslo = '" + uc.Geslo + "');";
             ResultSet rs = stmt.executeQuery(sql);
-            //prever če ma rowe in ce nima vrn false
+            if(!rs.next())
+                return false;
+
             rs.close();
             stmt.close();
         }
@@ -231,7 +233,7 @@ public class RedovalnicaDatabase {
             ResultSet rs = stmt.executeQuery(sql);
 
             while(rs.next()) {
-                String ucenec = rs.getString(0);
+                String ucenec = rs.getString(1);
                 int stO = rs.getInt(1);
 
                 Ocena oc = new Ocena(ucenec, stO);
@@ -285,7 +287,7 @@ public class RedovalnicaDatabase {
             String sql = "SELECT id_razredi_predmeti FROM razredi_predmeti WHERE (id_predmeti = (SELECT id_predmeti FROM predmeti WHERE predmet = '" + rp.ImeP + "')) AND (id_razredi = (SELECT r.id_razredi FROM razredi r INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta WHERE (r.razred = '\" + rp.ImeR + \"') AND (sl.solsko_leto = '" + rp.SLeto + "'))) AND (id_ucitelji = (SELECT id_ucitelji FROM ucitelji WHERE (id_osebe = (SELECT id_osebe FROM osebe WHERE ime || ' ' || priimek = '" + rp.UciteljP + "'))));";
             ResultSet rs = stmt.executeQuery(sql);
             while(!rs.next()){
-                id = rs.getInt(0);
+                id = rs.getInt(1);
             }
             rs.close();
             stmt.close();
@@ -314,7 +316,7 @@ public class RedovalnicaDatabase {
             String sql = "SELECT id_ure_izvedb FROM ure_izvedb WHERE (id_razredi_predmeti = '" + ure.Id_R_P_U + "') AND (id_vrste_ur = (SELECT id_vrste_ur FROM vrste_ur WHERE vrsta_ure = '" + ure.VrstaUre + "')) AND (datum_cas LIKE '%" + ure.DatumCas + "%');";
             ResultSet rs = stmt.executeQuery(sql);
             while(rs.next()){
-                id = rs.getInt(0);
+                id = rs.getInt(1);
             }
             rs.close();
             stmt.close();
@@ -344,7 +346,7 @@ public class RedovalnicaDatabase {
             String sql = "SELECT COUNT(u.*) FROM ucenci u INNER JOIN razredi r ON r.id_razredi = u.id_razredi INNER JOIN solska_leta sl ON r.id_solska_leta = sl.id_solska_leta WHERE(sl.solsko_leto = '" + r.SLeto + "') AND (r.razred = '" + r.ImeR + "')";
             ResultSet rs = stmt.executeQuery(sql);
             while(rs.next()){
-                st_ucencevR = rs.getInt(0);
+                st_ucencevR = rs.getInt(1);
             }
             rs.close();
             stmt.close();
@@ -363,7 +365,7 @@ public class RedovalnicaDatabase {
             ResultSet rs = stmt.executeQuery(sql);
             if(rs.next()){
                 while(rs.next())
-                    st_ucencev1 = rs.getInt(0);
+                    st_ucencev1 = rs.getInt(1);
             }
         }
         catch (SQLException throwables){
@@ -380,7 +382,7 @@ public class RedovalnicaDatabase {
             ResultSet rs = stmt.executeQuery(sql);
             if(rs.next()){
                 while(rs.next())
-                    st_ucencev2 = rs.getInt(0);
+                    st_ucencev2 = rs.getInt(1);
             }
         }
         catch (SQLException throwables){
@@ -397,7 +399,7 @@ public class RedovalnicaDatabase {
             ResultSet rs = stmt.executeQuery(sql);
             if(rs.next()){
                 while(rs.next())
-                    st_ucencev3 = rs.getInt(0);
+                    st_ucencev3 = rs.getInt(1);
             }
         }
         catch (SQLException throwables){
@@ -414,7 +416,7 @@ public class RedovalnicaDatabase {
             ResultSet rs = stmt.executeQuery(sql);
             if(rs.next()){
                 while(rs.next())
-                    st_ucencev4 = rs.getInt(0);
+                    st_ucencev4 = rs.getInt(1);
             }
         }
         catch (SQLException throwables){
@@ -431,7 +433,7 @@ public class RedovalnicaDatabase {
             ResultSet rs = stmt.executeQuery(sql);
             if(rs.next()){
                 while(rs.next())
-                    st_ucencev5 = rs.getInt(0);
+                    st_ucencev5 = rs.getInt(1);
             }
         }
         catch (SQLException throwables){
