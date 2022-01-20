@@ -1,11 +1,10 @@
 package Redovalnica_Java;
 
+import com.toedter.calendar.JDateChooser;
+
 import javax.swing.*;
-import javax.swing.border.Border;
-import java.awt.*;
 
 public class App {
-
     private JPanel panelApp;
     private JTabbedPane tabbedPane1;
     private JComboBox comboBox1;
@@ -16,7 +15,9 @@ public class App {
     private JButton potrdiPrisotnostButton;
     private JButton preveriPrisotnostZaNazajButton;
     private JTree tree1;
+    private JPanel jCal;
 
+    JDateChooser chooser = new JDateChooser();
     public App(){
         JFrame jframe = new JFrame("Redovalnica");
         jframe.setContentPane(panelApp);
@@ -25,5 +26,7 @@ public class App {
         jframe.setSize(700, 500);
         jframe.setResizable(false);
         jframe.setVisible(true);
+
+        jCal.add(chooser);
     }
 }
