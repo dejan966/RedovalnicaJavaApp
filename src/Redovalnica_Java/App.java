@@ -1,19 +1,21 @@
 package Redovalnica_Java;
 
-import org.jdatepicker.impl.JDatePanelImpl;
-import org.jdatepicker.impl.JDatePickerImpl;
-import org.jdatepicker.impl.UtilDateModel;
-
 import javax.swing.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Properties;
+import javax.swing.border.Border;
+import java.awt.*;
 
 public class App {
 
     private JPanel panelApp;
     private JTabbedPane tabbedPane1;
+    private JComboBox comboBox1;
+    private JComboBox comboBox2;
+    private JComboBox comboBox3;
+    private JComboBox comboBox4;
+    private JTextField textField1;
+    private JButton potrdiPrisotnostButton;
+    private JButton preveriPrisotnostZaNazajButton;
+    private JTree tree1;
 
     public App(){
         JFrame jframe = new JFrame("Redovalnica");
@@ -23,35 +25,5 @@ public class App {
         jframe.setSize(700, 500);
         jframe.setResizable(false);
         jframe.setVisible(true);
-
-        UtilDateModel model = new UtilDateModel();
-        Properties p = new Properties();
-        p.put("text.today", "Today");
-        p.put("text.month", "Month");
-        p.put("text.year", "Year");
-        JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
-        JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
-
-        jframe.add(datePicker);
-    }
-
-    public class DateLabelFormatter extends JFormattedTextField.AbstractFormatter {
-        private String datePattern = "yyyy-MM-dd";
-        private SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
-
-        @Override
-        public Object stringToValue(String text) throws ParseException {
-            return dateFormatter.parseObject(text);
-        }
-
-        @Override
-        public String valueToString(Object value) throws ParseException {
-            if (value != null) {
-                Calendar cal = (Calendar) value;
-                return dateFormatter.format(cal.getTime());
-            }
-            return "";
-        }
-
     }
 }
