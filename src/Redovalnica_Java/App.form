@@ -41,19 +41,19 @@
                       <text value="Šolsko leto:"/>
                     </properties>
                   </component>
-                  <component id="194c1" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
+                  <component id="194c1" class="javax.swing.JComboBox" binding="SolskoLetoComboBoxP">
                     <constraints>
                       <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties/>
                   </component>
-                  <component id="8551a" class="javax.swing.JComboBox" binding="comboBox2" default-binding="true">
+                  <component id="8551a" class="javax.swing.JComboBox" binding="RazredComboBoxP">
                     <constraints>
                       <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties/>
                   </component>
-                  <component id="c4f32" class="javax.swing.JComboBox" binding="comboBox3" default-binding="true">
+                  <component id="c4f32" class="javax.swing.JComboBox" binding="PredmetComboBoxP">
                     <constraints>
                       <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -75,7 +75,7 @@
                       <text value="Predmet:"/>
                     </properties>
                   </component>
-                  <component id="f6906" class="javax.swing.JComboBox" binding="comboBox4" default-binding="true">
+                  <component id="f6906" class="javax.swing.JComboBox" binding="VrstaUrComboBox">
                     <constraints>
                       <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -170,19 +170,19 @@
                 <properties/>
                 <border type="none" title="Prisotnost"/>
                 <children>
-                  <component id="e901a" class="javax.swing.JComboBox" binding="comboBox5" default-binding="true">
+                  <component id="e901a" class="javax.swing.JComboBox" binding="SolskoLetoComboBoxO">
                     <constraints>
                       <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties/>
                   </component>
-                  <component id="8b875" class="javax.swing.JComboBox" binding="comboBox6" default-binding="true">
+                  <component id="8b875" class="javax.swing.JComboBox" binding="RazredComboBoxO">
                     <constraints>
                       <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties/>
                   </component>
-                  <component id="51f45" class="javax.swing.JComboBox" binding="comboBox7" default-binding="true">
+                  <component id="51f45" class="javax.swing.JComboBox" binding="PredmetComboBoxO">
                     <constraints>
                       <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -195,22 +195,6 @@
                     <properties>
                       <text value="Vnesi oceno"/>
                     </properties>
-                  </component>
-                  <component id="1faa0" class="javax.swing.JButton" binding="statistikaZaOceneButton" default-binding="true">
-                    <constraints>
-                      <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                    <properties>
-                      <text value="Statistika za ocene"/>
-                    </properties>
-                  </component>
-                  <component id="52acb" class="javax.swing.JTextField" binding="textField2" default-binding="true">
-                    <constraints>
-                      <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                        <preferred-size width="150" height="-1"/>
-                      </grid>
-                    </constraints>
-                    <properties/>
                   </component>
                   <component id="77f4b" class="javax.swing.JLabel">
                     <constraints>
@@ -236,6 +220,20 @@
                       <text value="Predmet:"/>
                     </properties>
                   </component>
+                  <component id="63a43" class="javax.swing.JTree" binding="tree2" default-binding="true">
+                    <constraints>
+                      <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                        <preferred-size width="150" height="50"/>
+                      </grid>
+                    </constraints>
+                    <properties/>
+                  </component>
+                  <component id="efa46" class="javax.swing.JComboBox" binding="OcenaComboBox">
+                    <constraints>
+                      <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties/>
+                  </component>
                   <component id="f8ef7" class="javax.swing.JLabel">
                     <constraints>
                       <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -244,13 +242,13 @@
                       <text value="Ocena:"/>
                     </properties>
                   </component>
-                  <component id="63a43" class="javax.swing.JTree" binding="tree2" default-binding="true">
+                  <component id="1faa0" class="javax.swing.JButton" binding="statistikaZaOceneButton" default-binding="true">
                     <constraints>
-                      <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                        <preferred-size width="150" height="50"/>
-                      </grid>
+                      <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
-                    <properties/>
+                    <properties>
+                      <text value="Statistika za ocene"/>
+                    </properties>
                   </component>
                 </children>
               </grid>

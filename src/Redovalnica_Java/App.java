@@ -3,23 +3,18 @@ package Redovalnica_Java;
 import com.toedter.calendar.JDateChooser;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.Date;
 
 public class App {
     private JPanel panelApp;
     private JTabbedPane tabbedPane1;
-    private JComboBox comboBox1;
-    private JComboBox comboBox2;
-    private JComboBox comboBox3;
-    private JComboBox comboBox4;
+    private JComboBox SolskoLetoComboBoxP;
+    private JComboBox RazredComboBoxP;
+    private JComboBox PredmetComboBoxP;
+    private JComboBox VrstaUrComboBox;
     private JTextField textField1;
     private JButton potrdiPrisotnostButton;
     private JButton preveriPrisotnostZaNazajButton;
@@ -27,16 +22,17 @@ public class App {
     private JPanel jCal;
     private JButton vnesiOcenoButton;
     private JButton statistikaZaOceneButton;
-    private JComboBox comboBox5;
-    private JComboBox comboBox6;
-    private JComboBox comboBox7;
-    private JTextField textField2;
+    private JComboBox SolskoLetoComboBoxO;
+    private JComboBox RazredComboBoxO;
+    private JComboBox PredmetComboBoxO;
     private JTree tree2;
     private JPanel jCal2;
+    private JComboBox OcenaComboBox;
 
     JDateChooser chooser = new JDateChooser();
     JDateChooser chooser2 = new JDateChooser();
-    public App(){
+
+    public App() throws SQLException {
         JFrame jframe = new JFrame("Redovalnica");
         jframe.setContentPane(panelApp);
         jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -47,12 +43,33 @@ public class App {
 
         jCal.add(chooser);
         jCal2.add(chooser2);
-        /*chooser.getDateEditor().addPropertyChangeListener(e -> {
-                    if ("date".equals(e.getPropertyName())) {
-                        System.out.println(e.getPropertyName()
-                                + ": " + (Date) e.getNewValue());
-                    }
-                });*/
+
+        RedovalnicaDatabase rd = new RedovalnicaDatabase();
+        for (Solsko_Leto item : rd.ReturnVsaSolskaLeta()){
+            SolskoLetoComboBoxP.addItem(item.SLeto);
+            SolskoLetoComboBoxO.addItem(item.SLeto);
+        }
+
+        RedovalnicaDatabase rd2 = new RedovalnicaDatabase();
+        for (Razred item : rd2.ReturnVseRazrede()){
+            RazredComboBoxP.addItem(item.ImeR);
+            RazredComboBoxO.addItem(item.ImeR);
+        }
+
+        RedovalnicaDatabase rd3 = new RedovalnicaDatabase();
+        for (RazredPredmet item : rd3.ReturnVsePredmete()){
+            PredmetComboBoxP.addItem(item.ImeP);
+            PredmetComboBoxO.addItem(item.ImeP);
+        }
+
+        RedovalnicaDatabase rd4 = new RedovalnicaDatabase();
+        for(Vrsta_Ur item : rd4.ReturnVseVrsteUr())
+            VrstaUrComboBox.addItem(item.Ura);
+
+        RedovalnicaDatabase rd5 = new RedovalnicaDatabase();
+        for(Ocena item : rd5.ReturnVseOcene())
+            OcenaComboBox.addItem(item.StO);
+
         statistikaZaOceneButton.addActionListener(e -> {
             jframe.dispose();
             new Statistika();
