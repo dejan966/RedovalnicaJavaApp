@@ -5,6 +5,13 @@ import com.toedter.calendar.JDateChooser;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Date;
 
 public class App {
     private JPanel panelApp;
@@ -40,9 +47,24 @@ public class App {
 
         jCal.add(chooser);
         jCal2.add(chooser2);
+        /*chooser.getDateEditor().addPropertyChangeListener(e -> {
+                    if ("date".equals(e.getPropertyName())) {
+                        System.out.println(e.getPropertyName()
+                                + ": " + (Date) e.getNewValue());
+                    }
+                });*/
         statistikaZaOceneButton.addActionListener(e -> {
             jframe.dispose();
             new Statistika();
+        });
+        potrdiPrisotnostButton.addActionListener(e -> {
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime now = LocalDateTime.now();
+            String Idate = dtf.format(now);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String Sdate = sdf.format(chooser.getDate());
+            JOptionPane.showMessageDialog(null, Sdate);
         });
     }
 }
