@@ -171,20 +171,21 @@ public class RedovalnicaDatabase {
             Statement stmt = newConn.createStatement();
             String sql = "SELECT o.ime, o.priimek FROM osebe o INNER JOIN ucenci u ON u.id_osebe = o.id_osebe INNER JOIN razredi r ON u.id_razredi = r.id_razredi INNER JOIN solska_leta sl on sl.id_solska_leta = r.id_solska_leta WHERE(r.razred = '" + ru.ImeR + "') AND (sl.solsko_leto = '" + ru.SLeto + "')";
             ResultSet rs = stmt.executeQuery(sql);
+            /* pogoj ni vredu
             if(rs.next()){
-                while(rs.next()) {
-                    String ime = rs.getString("ime");
-                    String priimek = rs.getString("priimek");
 
-                    Ucenec uc = new Ucenec(ime, priimek);
-                    ucenci.add(uc);
-                }
             }
             else{
                 Ucenec u = new Ucenec("", "");
                 ucenci.add(u);
-            }
+            }*/
+            while(rs.next()) {
+                String ime = rs.getString("ime");
+                String priimek = rs.getString("priimek");
 
+                Ucenec uc = new Ucenec(ime, priimek);
+                ucenci.add(uc);
+            }
             rs.close();
             stmt.close();
         } catch (SQLException throwables) {

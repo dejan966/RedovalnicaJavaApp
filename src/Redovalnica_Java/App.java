@@ -65,19 +65,21 @@ public class App {
         jCal.add(chooser);
         jCal2.add(chooser2);
 
-        //removing the default items from PrisotnostJtree
+        //removing the default child nodes from PrisotnostJtree
         DefaultTreeModel modelP = (DefaultTreeModel) PrisotnostTree.getModel();
         DefaultMutableTreeNode rootP = (DefaultMutableTreeNode) modelP.getRoot();
         rootP.removeAllChildren();
         modelP.reload();
-        modelP.setRoot(null);
+        DefaultMutableTreeNode newRootNodeP = new DefaultMutableTreeNode("Učenec");
+        modelP.setRoot(newRootNodeP);
 
-        //removing the default items from OcenaJtree
+        //removing the default child nodes from OcenaJtree
         DefaultTreeModel modelO = (DefaultTreeModel) OcenaTree.getModel();
         DefaultMutableTreeNode rootO = (DefaultMutableTreeNode) modelO.getRoot();
         rootO.removeAllChildren();
         modelO.reload();
-        modelO.setRoot(null);
+        DefaultMutableTreeNode newRootNodeO = new DefaultMutableTreeNode("Učenec");
+        modelO.setRoot(newRootNodeO);
 
         RedovalnicaDatabase rb = new RedovalnicaDatabase();
         Ucitelj mail = new Ucitelj(sMail);
@@ -90,12 +92,6 @@ public class App {
             SolskoLetoComboBoxP.addItem(item.SLeto);
             SolskoLetoComboBoxO.addItem(item.SLeto);
         }
-
-        /*RedovalnicaDatabase rd2 = new RedovalnicaDatabase();
-        for (Razred item : rd2.ReturnVseRazrede()){
-            RazredComboBoxP.addItem(item.ImeR);
-            RazredComboBoxO.addItem(item.ImeR);
-        }*/
 
         try {
             RedovalnicaDatabase s = new RedovalnicaDatabase();
@@ -124,33 +120,17 @@ public class App {
             OcenaComboBox.addItem(item.StO);
 
         RedovalnicaDatabase rt = new RedovalnicaDatabase();
-        Razred r = new Razred(RazredComboBoxP.getSelectedItem().toString());
+        Razred r = new Razred(RazredComboBoxP.getSelectedItem().toString(), SolskoLetoComboBoxP.getSelectedItem().toString());
         for(Ucenec item: rt.ReturnUcenci_Razred(r)){
-            /*rootP.add(new DefaultMutableTreeNode("Učenci"));
-            rootP.add(new DefaultMutableTreeNode(item.Ime + " " + item.Priimek));
-            modelP.reload();*/
-            //UpdatePrisotnostJTree(item.Ime + " " + item.Priimek);
-            /* DefaultTreeModel model = (DefaultTreeModel)PrisotnostTree.getModel();
-            DefaultMutableTreeNode root = (DefaultMutableTreeNode)model.getRoot();
-            root.add(new DefaultMutableTreeNode("Učenci"));
-            root.add(new DefaultMutableTreeNode(item.Ime + " " + item.Priimek));
-            model.reload(root);*/
-            /* Dodaš nov node v ttmu nodu, ki je selectan
-            DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)OcenaTree.getSelectionPath().getLastPathComponent();
-            DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(item.Ime + " " + item.Priimek);
-            selectedNode.add(newNode);
+            DefaultTreeModel modelP2 = (DefaultTreeModel)PrisotnostTree.getModel();
+            DefaultMutableTreeNode rootP2 = (DefaultMutableTreeNode)modelP2.getRoot();
+            rootP2.add(new DefaultMutableTreeNode(item.Ime + " " + item.Priimek));
+            modelP2.reload(rootP2);
 
-            DefaultTreeModel model = (DefaultTreeModel)PrisotnostTree.getModel();
-            model.reload(); */
-            /* DefaultTreeModel model = (DefaultTreeModel)PrisotnostTree.getModel();
-            DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("Učenec");
-            DefaultMutableTreeNode childNodes = new DefaultMutableTreeNode(item.Ime + " " + item.Priimek);
-            rootNode.add(childNodes);
-            PrisotnostTree = new JTree(rootNode);*/
-            DefaultTreeModel model = (DefaultTreeModel)PrisotnostTree.getModel();
-            DefaultMutableTreeNode root = (DefaultMutableTreeNode)model.getRoot();
-            root.add(new DefaultMutableTreeNode("another_child"));
-            model.reload(root);
+            DefaultTreeModel modelO2 = (DefaultTreeModel)OcenaTree.getModel();
+            DefaultMutableTreeNode rootO2 = (DefaultMutableTreeNode)modelO2.getRoot();
+            rootO2.add(new DefaultMutableTreeNode(item.Ime + " " + item.Priimek));
+            modelO2.reload(rootO2);
         }
         statistikaZaOceneButton.addActionListener(e -> {
             jframe.dispose();
