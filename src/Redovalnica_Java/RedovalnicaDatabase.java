@@ -199,19 +199,12 @@ public class RedovalnicaDatabase {
             Statement stmt = newConn.createStatement();
             String sql = "SELECT r.razred FROM razredi r INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta WHERE (sl.solsko_leto = '" + s.SLeto + "')";
             ResultSet rs = stmt.executeQuery(sql);
-            if(rs.next()){
-                while(rs.next()) {
-                    String razred = rs.getString("razred");
+            while(rs.next()){
+                String razred = rs.getString("razred");
 
-                    Razred r = new Razred(razred);
-                    razrediS.add(r);
-                }
+                Razred r = new Razred(razred);
+                razrediS.add(r);
             }
-            else{
-                Razred u = new Razred("");
-                razrediS.add(u);
-            }
-
             rs.close();
             stmt.close();
         } catch (SQLException throwables) {
@@ -258,7 +251,7 @@ public class RedovalnicaDatabase {
             Statement stmt = newConn.createStatement();
             String sql = "SELECT p.predmet, r.razred, o.ime || ' ' || o.priimek FROM osebe o INNER JOIN ucitelji u on o.id_osebe = u.id_osebe INNER JOIN razredi_predmeti rp on u.id_ucitelji = rp.id_ucitelji INNER JOIN razredi r on rp.id_razredi = r.id_razredi INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta INNER JOIN predmeti p on rp.id_predmeti = p.id_predmeti WHERE (p.predmet = '\" + rp.ImeP + \"') AND (r.razred = '\" + rp.ImeR + \"') AND (sl.solsko_leto = '\" + rp.SLeto + \"') AND (ime || ' ' || priimek = '\" + rp.UciteljP + \"')";
             ResultSet rs = stmt.executeQuery(sql);
-            if(!rs.next()){
+            if(rs.next()){
                 final Connection newConn2 = DriverManager.getConnection(jdbcURL, username, password);
                 Statement stmt2 = newConn2.createStatement();
                 String sql2 = "INSERT INTO razredi_predmeti (id_predmeti, id_razredi, id_ucitelji) VALUES ((SELECT id_predmeti FROM predmeti WHERE predmet = '" + rp.ImeP + "'), (SELECT r.id_razredi FROM razredi r INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta WHERE (r.razred = '" + rp.ImeR + "') AND (sl.solsko_leto = '" + rp.SLeto + "')), (SELECT id_ucitelji FROM ucitelji WHERE (id_osebe = (SELECT id_osebe FROM osebe WHERE ime || ' ' || priimek = '" + rp.UciteljP + "'))));";
@@ -279,9 +272,9 @@ public class RedovalnicaDatabase {
             Statement stmt = newConn.createStatement();
             String sql = "SELECT id_razredi_predmeti FROM razredi_predmeti WHERE (id_predmeti = (SELECT id_predmeti FROM predmeti WHERE predmet = '" + rp.ImeP + "')) AND (id_razredi = (SELECT r.id_razredi FROM razredi r INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta WHERE (r.razred = '\" + rp.ImeR + \"') AND (sl.solsko_leto = '" + rp.SLeto + "'))) AND (id_ucitelji = (SELECT id_ucitelji FROM ucitelji WHERE (id_osebe = (SELECT id_osebe FROM osebe WHERE ime || ' ' || priimek = '" + rp.UciteljP + "'))));";
             ResultSet rs = stmt.executeQuery(sql);
-            while(!rs.next()){
+            while(rs.next())
                 id = rs.getInt(1);
-            }
+
             rs.close();
             stmt.close();
         }
@@ -339,17 +332,17 @@ public class RedovalnicaDatabase {
                     "UNION (SELECT o.ime, o.priimek FROM osebe o INNER JOIN ucenci u ON u.id_osebe = o.id_osebe INNER JOIN prisotnosti p on p.id_ucenci = u.id_ucenci INNER JOIN ure_izvedb ui on ui.id_ure_izvedb = p.id_ure_izvedb INNER JOIN vrste_ur vu on vu.id_vrste_ur = ui.id_vrste_ur INNER JOIN razredi_predmeti rp on rp.id_razredi_predmeti = ui.id_razredi_predmeti INNER JOIN razredi r on r.id_razredi = rp.id_razredi INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta INNER JOIN predmeti pr on pr.id_predmeti = rp.id_predmeti " +
                     "WHERE(ui.datum_cas LIKE '%" + pZaNazaj.DatumCas + "%') AND(r.razred = '" + pZaNazaj.ImeR + "') AND(pr.predmet = '" + pZaNazaj.ImeP + "') AND(vu.vrsta_ure = '" + pZaNazaj.VrstaUre + "') AND (sl.solsko_leto = '" + pZaNazaj.SLeto + "'))";
             ResultSet rs = stmt.executeQuery(sql);
-            if (rs.next()){
+            if (!rs.next()){
+                Ucenec u = new Ucenec("", "");
+                ucenci.add(u);
+            }
+            else{
                 while(rs.next()){
                     String ime = rs.getString(1);
                     String priimek = rs.getString(2);
                     Ucenec u = new Ucenec(ime, priimek);
                     ucenci.add(u);
                 }
-            }
-            else{
-                Ucenec u = new Ucenec("", "");
-                ucenci.add(u);
             }
             rs.close();
             stmt.close();

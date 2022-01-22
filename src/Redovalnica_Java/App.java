@@ -4,12 +4,16 @@ import com.toedter.calendar.JDateChooser;
 
 import javax.swing.*;
 import javax.swing.tree.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 public class App {
     private JPanel panelApp;
@@ -36,6 +40,8 @@ public class App {
 
     static String sMail;
     static String imePriimekUcitelja;
+    ArrayList<String> mankjkajociUcenci = new ArrayList<String>();
+    String[] mU;
 
     JDateChooser chooser = new JDateChooser();
     JDateChooser chooser2 = new JDateChooser();
@@ -69,6 +75,7 @@ public class App {
         jCal.add(chooser);
         jCal2.add(chooser2);
 
+        potrdiPrisotnostButton.setEnabled(false);
         //removing the default child nodes from PrisotnostJtree
         DefaultTreeModel modelP = (DefaultTreeModel) PrisotnostTree.getModel();
         DefaultMutableTreeNode rootP = (DefaultMutableTreeNode) modelP.getRoot();
@@ -218,8 +225,10 @@ public class App {
                 modelP2.reload();
                 Razred r2 = new Razred(RazredComboBoxP.getSelectedItem().toString(), SolskoLetoComboBoxP.getSelectedItem().toString());
                 for(Ucenec item: rc.ReturnUcenci_Razred(r2))
-                    if(item.Ime != "" && item.Priimek != "")
+                    if(item.Ime != "" && item.Priimek != "") {
+                        mankjkajociUcenci.add(item.Ime + ' ' + item.Priimek);
                         UpdatePrisotnostJTree(item.Ime, item.Priimek);
+                    }
             }catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -243,15 +252,18 @@ public class App {
             if(SolskoLetoComboBoxO.getSelectedItem().toString() != "" && RazredComboBoxO.getSelectedItem().toString() != "" && PredmetComboBoxO.getSelectedItem().toString() != ""){
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 String Sdate = sdf.format(chooser2.getDate());
-                JOptionPane.showMessageDialog(null, Sdate);
+
                 DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)OcenaTree.getSelectionPath().getLastPathComponent();
                 String ucenec = selectedNode.getUserObject().toString();
                 try {
+                    RedovalnicaDatabase rp = new RedovalnicaDatabase();
+                    RazredPredmet razredPredmet = new RazredPredmet(PredmetComboBoxO.getSelectedItem().toString(), RazredComboBoxO.getSelectedItem().toString(), imePriimekUcitelja, SolskoLetoComboBoxO.getSelectedItem().toString());
+                    rp.InsertRazrediPredmeti(razredPredmet);
+
                     RedovalnicaDatabase rs = new RedovalnicaDatabase();
                     Ocena ocena = new Ocena(ucenec, OcenaComboBox.getSelectedItem().toString(), Sdate, PredmetComboBoxO.getSelectedItem().toString(), RazredComboBoxO.getSelectedItem().toString(), SolskoLetoComboBoxO.getSelectedItem().toString(), imePriimekUcitelja);
                     rs.InsertOcena_Ucenec(ocena);
-                    //JOptionPane.showMessageDialog(null, "Uspešno dodana ocena za učenca " + ucenec + ".", "Uspešno", JOptionPane.INFORMATION_MESSAGE);
-                } catch (SQLException ex) {
+                }catch (SQLException ex) {
                     JOptionPane.showMessageDialog(null, "Ocene ni bilo mogoče dodati za ucenca " + ucenec + ".", "Error", JOptionPane.ERROR_MESSAGE);
                     ex.printStackTrace();
                 }
@@ -279,5 +291,35 @@ public class App {
                 }
             }
             });
+        PrisotnostTree.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                potrdiPrisotnostButton.setEnabled(true);
+                //spremen barvo noda na rdečo
+                DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)PrisotnostTree.getSelectionPath().getLastPathComponent();
+                mankjkajociUcenci.remove(selectedNode.getUserObject().toString());
+                mU = mankjkajociUcenci.toArray(new String[1]);
+                JOptionPane.showMessageDialog(null, mU[1]);
+                super.mouseClicked(e);
+            }
+        });
+    }
+    public class MyTreeCellRenderer extends DefaultTreeCellRenderer {
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value,
+            boolean sel, boolean exp, boolean leaf, int row, boolean hasFocus) {
+            super.getTreeCellRendererComponent(tree, value, sel, exp, leaf, row, hasFocus);
+
+            // Assuming you have a tree of Strings
+            String node = (String) ((DefaultMutableTreeNode) value).getUserObject();
+
+            // If the node is a leaf and ends with "xxx"
+            if (leaf && node.endsWith("xxx")) {
+                // Paint the node in blue
+                setForeground(new Color(13, 57 ,115));
+            }
+
+            return this;
+        }
     }
 }
