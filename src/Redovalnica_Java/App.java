@@ -45,13 +45,17 @@ public class App {
         sMail = mail;
     }
 
-    public void UpdatePrisotnostJTree(final String nodeToAdd){
-        DefaultTreeModel model = (DefaultTreeModel) PrisotnostTree.getModel();
-        DefaultMutableTreeNode root = (DefaultMutableTreeNode) PrisotnostTree.getModel().getRoot();
-        DefaultMutableTreeNode child = new DefaultMutableTreeNode(nodeToAdd);
-        model.insertNodeInto(child, root, root.getChildCount());
-        PrisotnostTree.scrollPathToVisible(new TreePath(child.getPath()));
-        model.reload();
+    public void UpdatePrisotnostJTree(String ime, String priimek){
+        DefaultTreeModel modelP = (DefaultTreeModel)PrisotnostTree.getModel();
+        DefaultMutableTreeNode rootP = (DefaultMutableTreeNode)modelP.getRoot();
+        rootP.add(new DefaultMutableTreeNode(ime + " " + priimek));
+        modelP.reload(rootP);
+    }
+    public void UpdateOcenaJTree(String ime, String priimek){
+        DefaultTreeModel modelO = (DefaultTreeModel)OcenaTree.getModel();
+        DefaultMutableTreeNode rootO = (DefaultMutableTreeNode)modelO.getRoot();
+        rootO.add(new DefaultMutableTreeNode(ime + " " + priimek));
+        modelO.reload(rootO);
     }
     public App() throws SQLException {
         JFrame jframe = new JFrame("Redovalnica");
@@ -92,17 +96,11 @@ public class App {
             SolskoLetoComboBoxP.addItem(item.SLeto);
             SolskoLetoComboBoxO.addItem(item.SLeto);
         }
-
-        try {
-            RedovalnicaDatabase s = new RedovalnicaDatabase();
-            Solsko_Leto sl = new Solsko_Leto(SolskoLetoComboBoxP.getSelectedItem().toString());
-            for(Razred item : s.ReturnRazred_SolskoLeto(sl)){
-                RazredComboBoxP.addItem(item.ImeR);
-                RazredComboBoxO.addItem(item.ImeR);
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        RedovalnicaDatabase s = new RedovalnicaDatabase();
+        Solsko_Leto sl = new Solsko_Leto(SolskoLetoComboBoxP.getSelectedItem().toString());
+        for(Razred item : s.ReturnRazred_SolskoLeto(sl)){
+            RazredComboBoxP.addItem(item.ImeR);
+            RazredComboBoxO.addItem(item.ImeR);
         }
 
         RedovalnicaDatabase rd3 = new RedovalnicaDatabase();
@@ -143,7 +141,7 @@ public class App {
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             String Sdate = sdf.format(chooser.getDate());
-            JOptionPane.showMessageDialog(null, Sdate);
+
             if(SolskoLetoComboBoxP.getSelectedItem().toString() != "" && RazredComboBoxP.getSelectedItem().toString() != "" && PredmetComboBoxP.getSelectedItem().toString() != "" && VrstaUrComboBox.getSelectedItem().toString() != ""){
                 String opomba = textField1.getText();
                 try {
@@ -191,11 +189,10 @@ public class App {
         });
         SolskoLetoComboBoxP.addItemListener(e -> {
             RazredComboBoxP.removeAllItems();
-
             try {
-                RedovalnicaDatabase s = new RedovalnicaDatabase();
-                Solsko_Leto sl = new Solsko_Leto(SolskoLetoComboBoxP.getSelectedItem().toString());
-                for(Razred item : s.ReturnRazred_SolskoLeto(sl))
+                RedovalnicaDatabase s2 = new RedovalnicaDatabase();
+                Solsko_Leto sl2 = new Solsko_Leto(SolskoLetoComboBoxP.getSelectedItem().toString());
+                for(Razred item : s2.ReturnRazred_SolskoLeto(sl2))
                     RazredComboBoxP.addItem(item.ImeR);
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -204,36 +201,63 @@ public class App {
         SolskoLetoComboBoxO.addItemListener(e -> {
             RazredComboBoxO.removeAllItems();
             try {
-                RedovalnicaDatabase s = new RedovalnicaDatabase();
-                Solsko_Leto sl = new Solsko_Leto(SolskoLetoComboBoxO.getSelectedItem().toString());
-                for(Razred item : s.ReturnRazred_SolskoLeto(sl))
+                RedovalnicaDatabase s2 = new RedovalnicaDatabase();
+                Solsko_Leto sl2 = new Solsko_Leto(SolskoLetoComboBoxO.getSelectedItem().toString());
+                for(Razred item : s2.ReturnRazred_SolskoLeto(sl2))
                     RazredComboBoxO.addItem(item.ImeR);
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
         });
-
         RazredComboBoxP.addItemListener(e -> {
-            //PrisotnostJtree
+            try{
+                RedovalnicaDatabase rc = new RedovalnicaDatabase();
+                DefaultTreeModel modelP2 = (DefaultTreeModel)PrisotnostTree.getModel();
+                DefaultMutableTreeNode rootP2 = (DefaultMutableTreeNode)modelP2.getRoot();
+                rootP2.removeAllChildren();
+                modelP2.reload();
+                Razred r2 = new Razred(RazredComboBoxP.getSelectedItem().toString(), SolskoLetoComboBoxP.getSelectedItem().toString());
+                for(Ucenec item: rc.ReturnUcenci_Razred(r2))
+                    if(item.Ime != "" && item.Priimek != "")
+                        UpdatePrisotnostJTree(item.Ime, item.Priimek);
+            }catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         });
         RazredComboBoxO.addItemListener(e -> {
-            //OcenaJtree
+            try{
+                RedovalnicaDatabase rc = new RedovalnicaDatabase();
+                Razred r2 = new Razred(RazredComboBoxO.getSelectedItem().toString(), SolskoLetoComboBoxO.getSelectedItem().toString());
+                DefaultTreeModel modelO2 = (DefaultTreeModel)OcenaTree.getModel();
+                DefaultMutableTreeNode rootO2 = (DefaultMutableTreeNode)modelO2.getRoot();
+                rootO2.removeAllChildren();
+                modelO2.reload();
+                for(Ucenec item: rc.ReturnUcenci_Razred(r2))
+                    if(item.Ime != "" && item.Priimek != "")
+                        UpdateOcenaJTree(item.Ime, item.Priimek);
+            }catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         });
         vnesiOcenoButton.addActionListener(e -> {
-            if(SolskoLetoComboBoxP.getSelectedItem().toString() != "" && RazredComboBoxP.getSelectedItem().toString() != "" && PredmetComboBoxP.getSelectedItem().toString() != "" && VrstaUrComboBox.getSelectedItem().toString() != ""){
+            if(SolskoLetoComboBoxO.getSelectedItem().toString() != "" && RazredComboBoxO.getSelectedItem().toString() != "" && PredmetComboBoxO.getSelectedItem().toString() != ""){
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                String Sdate = sdf.format(chooser.getDate());
+                String Sdate = sdf.format(chooser2.getDate());
+                JOptionPane.showMessageDialog(null, Sdate);
                 DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)OcenaTree.getSelectionPath().getLastPathComponent();
                 String ucenec = selectedNode.getUserObject().toString();
                 try {
                     RedovalnicaDatabase rs = new RedovalnicaDatabase();
                     Ocena ocena = new Ocena(ucenec, OcenaComboBox.getSelectedItem().toString(), Sdate, PredmetComboBoxO.getSelectedItem().toString(), RazredComboBoxO.getSelectedItem().toString(), SolskoLetoComboBoxO.getSelectedItem().toString(), imePriimekUcitelja);
-                    //funkcija
+                    rs.InsertOcena_Ucenec(ocena);
+                    //JOptionPane.showMessageDialog(null, "Uspešno dodana ocena za učenca " + ucenec + ".", "Uspešno", JOptionPane.INFORMATION_MESSAGE);
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(null, "Ocene ni bilo mogoče dodati za ucenca " + ucenec + ".", "Error", JOptionPane.ERROR_MESSAGE);
                     ex.printStackTrace();
                 }
             }
+            else
+                JOptionPane.showMessageDialog(null, "Morate izbrati vrednosti v combo boxih");
             });
         preveriPrisotnostZaNazajButton.addActionListener(e -> {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
