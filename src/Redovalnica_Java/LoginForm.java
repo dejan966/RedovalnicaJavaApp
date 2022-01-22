@@ -25,6 +25,7 @@ public class LoginForm {
             try {
                 RedovalnicaDatabase rd = new RedovalnicaDatabase();
                 if(rd.PreveriPrijavo(uc)){
+                    App.MailUcitelja(textField1.getText());
                     jframe.dispose();
                     new App();
                 }

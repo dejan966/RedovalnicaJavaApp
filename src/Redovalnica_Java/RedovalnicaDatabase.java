@@ -55,7 +55,6 @@ public class RedovalnicaDatabase {
             Statement stmt = newConn.createStatement();
             String sql = "SELECT o.ime, o.priimek FROM osebe o INNER JOIN ucenci u ON u.id_osebe = o.id_osebe";
             ResultSet rs = stmt.executeQuery(sql);
-
             while(rs.next()) {
                 String ime = rs.getString("ime");
                 String priimek = rs.getString("priimek");
@@ -76,7 +75,6 @@ public class RedovalnicaDatabase {
             Statement stmt = newConn.createStatement();
             String sql = "SELECT razred FROM razredi";
             ResultSet rs = stmt.executeQuery(sql);
-
             while(rs.next()) {
                 String razred = rs.getString("razred");
 
@@ -96,7 +94,6 @@ public class RedovalnicaDatabase {
             Statement stmt = newConn.createStatement();
             String sql = "SELECT predmet FROM predmeti";
             ResultSet rs = stmt.executeQuery(sql);
-
             while(rs.next()) {
                 String predmet = rs.getString("predmet");
 
@@ -116,7 +113,6 @@ public class RedovalnicaDatabase {
             Statement stmt = newConn.createStatement();
             String sql = "SELECT ocena_st FROM ocene";
             ResultSet rs = stmt.executeQuery(sql);
-
             while(rs.next()) {
                 int stO = rs.getInt("ocena_st");
 
@@ -136,7 +132,6 @@ public class RedovalnicaDatabase {
             Statement stmt = newConn.createStatement();
             String sql = "SELECT solsko_leto FROM solska_leta";
             ResultSet rs = stmt.executeQuery(sql);
-
             while(rs.next()) {
                 String solsko_leto = rs.getString("solsko_leto");
 
@@ -156,7 +151,6 @@ public class RedovalnicaDatabase {
             Statement stmt = newConn.createStatement();
             String sql = "SELECT vrsta_ure FROM vrste_ur";
             ResultSet rs = stmt.executeQuery(sql);
-
             while(rs.next()) {
                 String vrsta_ure = rs.getString("vrsta_ure");
 
@@ -177,21 +171,20 @@ public class RedovalnicaDatabase {
             Statement stmt = newConn.createStatement();
             String sql = "SELECT o.ime, o.priimek FROM osebe o INNER JOIN ucenci u ON u.id_osebe = o.id_osebe INNER JOIN razredi r ON u.id_razredi = r.id_razredi INNER JOIN solska_leta sl on sl.id_solska_leta = r.id_solska_leta WHERE(r.razred = '" + ru.ImeR + "') AND (sl.solsko_leto = '" + ru.SLeto + "')";
             ResultSet rs = stmt.executeQuery(sql);
+            if(rs.next()){
+                while(rs.next()) {
+                    String ime = rs.getString("ime");
+                    String priimek = rs.getString("priimek");
 
-            while(rs.next()) {
-                String ime = rs.getString("ime");
-                String priimek = rs.getString("priimek");
-
-                Ucenec uc = new Ucenec(ime, priimek);
-                ucenci.add(uc);
-            }
-            /*
-            else
-                {
-                    Ucenec u = new Ucenec("", "");
-                    ucenci.Add(u);
+                    Ucenec uc = new Ucenec(ime, priimek);
+                    ucenci.add(uc);
                 }
-             */
+            }
+            else{
+                Ucenec u = new Ucenec("", "");
+                ucenci.add(u);
+            }
+
             rs.close();
             stmt.close();
         } catch (SQLException throwables) {
@@ -205,19 +198,19 @@ public class RedovalnicaDatabase {
             Statement stmt = newConn.createStatement();
             String sql = "SELECT r.razred FROM razredi r INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta WHERE (sl.solsko_leto = '" + s.SLeto + "')";
             ResultSet rs = stmt.executeQuery(sql);
-            while(rs.next()) {
-                String razred = rs.getString("razred");
+            if(rs.next()){
+                while(rs.next()) {
+                    String razred = rs.getString("razred");
 
-                Razred r = new Razred(razred);
-                razrediS.add(r);
-            }
-            /*
-            else
-                {
-                    Razred u = new Razred("");
-                    razredi.Add(u);
+                    Razred r = new Razred(razred);
+                    razrediS.add(r);
                 }
-             */
+            }
+            else{
+                Razred u = new Razred("");
+                razrediS.add(u);
+            }
+
             rs.close();
             stmt.close();
         } catch (SQLException throwables) {
@@ -231,10 +224,9 @@ public class RedovalnicaDatabase {
             Statement stmt = newConn.createStatement();
             String sql = "SELECT DISTINCT o.ime || ' ' || o.priimek AS ucenec, oc.ocena_st, p.predmet FROM osebe o INNER JOIN ucenci u on o.id_osebe = u.id_osebe INNER JOIN razredi r on r.id_razredi = u.id_razredi INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta INNER JOIN razredi_predmeti rp on r.id_razredi = rp.id_razredi INNER JOIN ocene_ucenci ou on rp.id_razredi_predmeti = ou.id_razredi_predmeti INNER JOIN ocene_ucenci ou2 on u.id_ucenci = ou2.id_ucenci INNER JOIN predmeti p on p.id_predmeti = rp.id_predmeti INNER JOIN ocene oc on oc.id_ocene = ou.id_ocene WHERE (sl.solsko_leto = '" + prs.SLeto + "') AND (r.razred = '" + prs.ImeR + "')";
             ResultSet rs = stmt.executeQuery(sql);
-
             while(rs.next()) {
                 String ucenec = rs.getString(1);
-                int stO = rs.getInt(1);
+                int stO = rs.getInt(2);
 
                 Ocena oc = new Ocena(ucenec, stO);
                 ocene.add(oc);
@@ -315,9 +307,8 @@ public class RedovalnicaDatabase {
             Statement stmt = newConn.createStatement();
             String sql = "SELECT id_ure_izvedb FROM ure_izvedb WHERE (id_razredi_predmeti = '" + ure.Id_R_P_U + "') AND (id_vrste_ur = (SELECT id_vrste_ur FROM vrste_ur WHERE vrsta_ure = '" + ure.VrstaUre + "')) AND (datum_cas LIKE '%" + ure.DatumCas + "%');";
             ResultSet rs = stmt.executeQuery(sql);
-            while(rs.next()){
+            while(rs.next())
                 id = rs.getInt(1);
-            }
             rs.close();
             stmt.close();
         }
@@ -331,7 +322,7 @@ public class RedovalnicaDatabase {
         try(newConn)
         {
             Statement stmt = newConn.createStatement();
-            String sql = "INSERT INTO prisotnosti(id_ucenci, id_ure_izvedb, opomba) VALUES((SELECT id_ucenci FROM ucenci WHERE (id_osebe = (SELECT id_osebe FROM osebe WHERE ime || ' ' || priimek = '" + dPrisotnost.Ucenec + "'))), '" + dPrisotnost.Id_Ure_Izvedbe + "', '" + dPrisotnost.Opomba + "')";
+            String sql = "INSERT INTO prisotnosti(id_ucenci, id_ure_izvedb, opomba) VALUES((SELECT id_ucenci FROM ucenci WHERE (id_osebe = (SELECT id_osebe FROM osebe WHERE ime || ' ' || priimek = '" + dPrisotnost.Ucenec + "'))), '" + dPrisotnost.IdUr + "', '" + dPrisotnost.Opomba + "')";
             stmt.executeUpdate(sql);
             stmt.close();
         }
@@ -339,15 +330,43 @@ public class RedovalnicaDatabase {
             throwables.printStackTrace();
         }
     }
+    public ArrayList<Ucenec> ReturnUcenci_Razred_Predmet_Vrsta_Ure_SolskoLeto_Datum(Prisotnost pZaNazaj){
+        ArrayList<Ucenec> ucenci = new ArrayList<>();
+        try(newConn){
+            Statement stmt = newConn.createStatement();
+            String sql = "(SELECT o.ime, o.priimek FROM osebe o INNER JOIN ucenci u ON u.id_osebe = o.id_osebe INNER JOIN prisotnosti p on p.id_ucenci = u.id_ucenci INNER JOIN razredi r ON u.id_razredi = r.id_razredi INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta INNER JOIN razredi_predmeti rp on r.id_razredi = rp.id_razredi INNER JOIN predmeti pr on pr.id_predmeti = rp.id_predmeti WHERE (r.razred = '" + pZaNazaj.ImeR + "') AND (pr.predmet = '" + pZaNazaj.ImeP + "') AND (sl.solsko_leto = '" + pZaNazaj.SLeto + "'))" +
+                    "UNION (SELECT o.ime, o.priimek FROM osebe o INNER JOIN ucenci u ON u.id_osebe = o.id_osebe INNER JOIN prisotnosti p on p.id_ucenci = u.id_ucenci INNER JOIN ure_izvedb ui on ui.id_ure_izvedb = p.id_ure_izvedb INNER JOIN vrste_ur vu on vu.id_vrste_ur = ui.id_vrste_ur INNER JOIN razredi_predmeti rp on rp.id_razredi_predmeti = ui.id_razredi_predmeti INNER JOIN razredi r on r.id_razredi = rp.id_razredi INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta INNER JOIN predmeti pr on pr.id_predmeti = rp.id_predmeti " +
+                    "WHERE(ui.datum_cas LIKE '%" + pZaNazaj.DatumCas + "%') AND(r.razred = '" + pZaNazaj.ImeR + "') AND(pr.predmet = '" + pZaNazaj.ImeP + "') AND(vu.vrsta_ure = '" + pZaNazaj.VrstaUre + "') AND (sl.solsko_leto = '" + pZaNazaj.SLeto + "'))";
+            ResultSet rs = stmt.executeQuery(sql);
+            if (rs.next()){
+                while(rs.next()){
+                    String ime = rs.getString(1);
+                    String priimek = rs.getString(2);
+                    Ucenec u = new Ucenec(ime, priimek);
+                    ucenci.add(u);
+                }
+            }
+            else{
+                Ucenec u = new Ucenec("", "");
+                ucenci.add(u);
+            }
+            rs.close();
+            stmt.close();
+        }
+        catch(SQLException throwables){
+            throwables.printStackTrace();
+        }
+        return ucenci;
+    }
+
     public int Return_StUcenci_Razred(Razred r){
         int st_ucencevR = 0;
         try(newConn){
             Statement stmt = newConn.createStatement();
             String sql = "SELECT COUNT(u.*) FROM ucenci u INNER JOIN razredi r ON r.id_razredi = u.id_razredi INNER JOIN solska_leta sl ON r.id_solska_leta = sl.id_solska_leta WHERE(sl.solsko_leto = '" + r.SLeto + "') AND (r.razred = '" + r.ImeR + "')";
             ResultSet rs = stmt.executeQuery(sql);
-            while(rs.next()){
+            while(rs.next())
                 st_ucencevR = rs.getInt(1);
-            }
             rs.close();
             stmt.close();
         }

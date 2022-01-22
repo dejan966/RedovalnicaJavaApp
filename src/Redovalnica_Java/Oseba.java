@@ -232,9 +232,9 @@ class UreIzvedbe extends RazredPredmet{
         IdUr = idUr;
     }
 
-    public UreIzvedbe(String predmet, String razred, String vrstaure, String datumCas)
+    public UreIzvedbe(String predmet, String razred, String sLeto, String vrstaure, String datumCas)
     {
-        super(predmet, razred);
+        super(predmet, razred, sLeto);
         VrstaUre = vrstaure;
         DatumCas = datumCas;
     }
@@ -253,17 +253,19 @@ class UreIzvedbe extends RazredPredmet{
 }
 class Prisotnost extends UreIzvedbe{
     public String Ucenec ;
-    public int Id_Ure_Izvedbe ;
     public String Opomba ;
     public Prisotnost()
     {
 
     }
-
+    public Prisotnost(String predmet, String razred, String solsko_leto, String vrsta_ure, String datum)
+    {
+        super(predmet, razred, solsko_leto, vrsta_ure, datum);
+    }
     public Prisotnost(String ucenec,int id_ure_izvedbe, String opomba)
     {
+        super(id_ure_izvedbe);
         Ucenec = ucenec;
-        Id_Ure_Izvedbe = id_ure_izvedbe;
         Opomba = opomba;
     }
 }
