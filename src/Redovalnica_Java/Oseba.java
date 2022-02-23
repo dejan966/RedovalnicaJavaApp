@@ -1,9 +1,10 @@
 package Redovalnica_Java;
 
 class Drzava{
-    public String Drzava_Slo;
-    public String Drzava_Iso;
-    public String DKratica;
+    private String Drzava_Slo;
+    public String getDrzavaSlo(){return Drzava_Slo; }
+    private String Drzava_Iso;
+    private String DKratica;
 
     public Drzava(){
 
@@ -11,10 +12,14 @@ class Drzava{
     public Drzava(String drzava_slo){
         Drzava_Slo = drzava_slo;
     }
+    public String toString(){
+        return "Država: " + getDrzavaSlo();
+    }
 }
 class Kraj extends Drzava{
-    public String ImeK;
-    public String Post_St;
+    private String ImeK;
+    public String getImeK(){return ImeK;}
+    private String Post_St;
 
     public Kraj(){
 
@@ -28,14 +33,23 @@ class Kraj extends Drzava{
         super(imed);
         ImeK = imek;
     }
+    public String _toString(){
+        return "Kraj: " + getImeK() + "\nDržava: " + super.getDrzavaSlo();
+    }
 }
 public class Oseba extends Kraj{
-    public String Ime;
-    public String Priimek ;
+    private String Ime;
+    public String getIme(){return Ime;}
+    private String Priimek ;
+    public String getPriimek(){return Priimek;}
     public char Spol ;
-    public String Datum_R ;
-    public String NaslovO ;
-    public String EmailO ;
+    public char getSpol(){return Spol;}
+    private String Datum_R ;
+    public String getDatum_R(){return Datum_R;}
+    private String NaslovO ;
+    public String getNaslovO(){return NaslovO;}
+    private String EmailO ;
+    public String getEmailO(){return EmailO;}
 
     public Oseba()
     {
@@ -56,11 +70,17 @@ public class Oseba extends Kraj{
         NaslovO = naslov;
         EmailO = email;
     }
+    public String _toString(){
+        return "\nIme: " + getIme() + "\nPriimek: " + getPriimek() + "\nSpol: " + getSpol() + "\nDatum rojstva: " + getDatum_R() + "\nNaslov: " + getNaslovO() + "\nEmail: " + getEmailO() + "\nKraj: " + super.getImeK();
+    }
 }
 class Ucenec extends Oseba{
-    public String URazred ;
-    public String USola ;
-    public String UcTelefon ;
+    private String URazred ;
+    public String getURazred(){return URazred;}
+    private String USola ;
+    public String getUSola(){return USola;}
+    private String UcTelefon ;
+    public String getUcTelefon(){return UcTelefon;}
     public Ucenec()
     {
 
@@ -79,12 +99,19 @@ class Ucenec extends Oseba{
         USola = imeSola;
         URazred = razred;
     }
+    public String _toString(){
+        return "\nIme: " + getIme() + "\nPriimek: " + getPriimek() + "\nSpol: " + getSpol() + "\nDatum rojstva: " + getDatum_R() + "\nNaslov: " + getNaslovO() + "\nEmail: " + getEmailO() + "\nKraj: " + super.getImeK() + "\nRazred: " + getURazred() + "\nŠola: " + getUSola();
+    }
 }
 class Ucitelj extends Oseba{
-    public String UcSola ;
-    public String Telefon ;
-    public String SolskiEmail ;
-    public String Geslo ;
+    private String UcSola ;
+    public String getUcSola(){return UcSola;}
+    private String Telefon ;
+    public String getTelefon(){return Telefon;}
+    private String SolskiEmail ;
+    public String getSolskiEmail(){return SolskiEmail;}
+    private String Geslo ;
+    public String getGeslo(){return Geslo;}
     public Ucitelj()
     {
 
@@ -109,10 +136,15 @@ class Ucitelj extends Oseba{
         Telefon = telefon;
         SolskiEmail = solskiEmail;
     }
+    public String getIme(){
+        return "\nIme: " + getIme() + "\nPriimek: " + getPriimek() + "\nSpol: " + getSpol() + "\nDatum rojstva: " + getDatum_R() + "\nNaslov: " + getNaslovO() + "\nEmail: " + getEmailO() + "\nKraj: " + super.getImeK() + "\nŠola: " + getUcSola() + "\nTelefon: " + getTelefon() + "\nKontakt: " + getSolskiEmail();
+
+    }
 }
 class Solsko_Leto
 {
-    public String SLeto ;
+    private String SLeto ;
+    public String getSLeto(){return SLeto;}
     public Solsko_Leto()
     {
 
@@ -121,11 +153,16 @@ class Solsko_Leto
     {
         SLeto = solsko_leto;
     }
+    public String _toString(){
+        return "Šolsko leto: " + getSLeto();
+    }
 }
 class Razred extends Solsko_Leto
 {
-    public String ImeR ;
+    private String ImeR ;
+    public String getImeR(){return ImeR;}
     public int St ;
+    public int getSt(){return St;}
     public Razred()
     {
 
@@ -139,12 +176,19 @@ class Razred extends Solsko_Leto
         super(s_leto);
         ImeR = imeR;
     }
+    public String _toString(){
+        return "Razred: " + getImeR() + "\nŠolsko leto: " + super.getSLeto();
+    }
 }
 class RazredPredmet extends Razred{
     public int Id_R_P_U ;
-    public String ImeP ;
-    public String KraticaP ;
-    public String UciteljP;
+    public int getId_R_P_U(){return Id_R_P_U;}
+    private String ImeP ;
+    public String getImeP(){return ImeP;}
+    private String KraticaP ;
+    public String getKraticaP(){return KraticaP;}
+    private String UciteljP;
+    public String getUciteljP(){return UciteljP;}
     public RazredPredmet()
     {
 
@@ -173,12 +217,19 @@ class RazredPredmet extends Razred{
         ImeP = predmet;
         UciteljP = ucitelj;
     }
+    public String _toString(){
+        return "Predmet: " + getImeP() + "\nRazred: " + super.getImeR() + "\nUčitelj: " + getUciteljP() + "\nŠolsko leto: " + super.getSLeto();
+    }
 }
 class Ocena extends RazredPredmet{
-    public String Ucenec ;
-    public String UOcena ;
-    public int StO ;
-    public String DatumOcena ;
+    private String Ucenec ;
+    public String getUcenec(){return Ucenec;}
+    private String UOcena ;
+    public String getUOcena(){return UOcena;}
+    private int StO ;
+    public int getStO(){return StO;}
+    private String DatumOcena ;
+    public String getDatumOcena(){return DatumOcena;}
     public Ocena()
     {
 
@@ -206,10 +257,14 @@ class Ocena extends RazredPredmet{
         UOcena = uOcena;
         DatumOcena = datum;
     }
+    public String _toString(){
+        return "Učenec: " + getUcenec() + "Ocena: " + getUOcena() + "Datum ocene: " + getDatumOcena() + "\nPredmet: " + getImeP() + "\nRazred: " + super.getImeR() + "\nUčitelj: " + getUciteljP() + "\nŠolsko leto: " + super.getSLeto();
+    }
 }
 class Vrsta_Ur
 {
-    public String Ura ;
+    private String Ura ;
+    public String getUra(){return Ura;}
     public Vrsta_Ur()
     {
 
@@ -218,11 +273,17 @@ class Vrsta_Ur
     {
         Ura = vrsta_ur;
     }
+    public String _toString(){
+        return "Vrsta ure: " + getUra();
+    }
 }
 class UreIzvedbe extends RazredPredmet{
     public int IdUr ;
-    public String VrstaUre ;
-    public String DatumCas ;
+    public int getIdUr(){return IdUr;}
+    private String VrstaUre ;
+    public String getVrstaUre(){return VrstaUre;}
+    private String DatumCas ;
+    public String getDatumCas(){return DatumCas;}
     public UreIzvedbe()
     {
 
@@ -250,10 +311,15 @@ class UreIzvedbe extends RazredPredmet{
         VrstaUre = vrstaure;
         DatumCas = datumCas;
     }
+    public String _toString(){
+        return "Predmet: " + getImeP() + "\nRazred: " + super.getImeR() + "\nUčitelj: " + getUciteljP() + "\nŠolsko leto: " + super.getSLeto() + "\nVrsta ure: " + getVrstaUre() + "\nDatum: " + getDatumCas();
+    }
 }
 class Prisotnost extends UreIzvedbe{
-    public String Ucenec ;
-    public String Opomba ;
+    private String UcenecN ;
+    public String getUcenecN(){return UcenecN;}
+    private String Opomba ;
+    public String getOpomba(){return Opomba;}
     public Prisotnost()
     {
 
@@ -265,7 +331,7 @@ class Prisotnost extends UreIzvedbe{
     public Prisotnost(String ucenec,int id_ure_izvedbe, String opomba)
     {
         super(id_ure_izvedbe);
-        Ucenec = ucenec;
+        UcenecN = ucenec;
         Opomba = opomba;
     }
 }

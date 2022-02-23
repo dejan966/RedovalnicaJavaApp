@@ -100,41 +100,41 @@ public class App {
 
         RedovalnicaDatabase rd = new RedovalnicaDatabase();
         for (Solsko_Leto item : rd.ReturnVsaSolskaLeta()){
-            SolskoLetoComboBoxP.addItem(item.SLeto);
-            SolskoLetoComboBoxO.addItem(item.SLeto);
+            SolskoLetoComboBoxP.addItem(item.getSLeto());
+            SolskoLetoComboBoxO.addItem(item.getSLeto());
         }
         RedovalnicaDatabase s = new RedovalnicaDatabase();
         Solsko_Leto sl = new Solsko_Leto(SolskoLetoComboBoxP.getSelectedItem().toString());
         for(Razred item : s.ReturnRazred_SolskoLeto(sl)){
-            RazredComboBoxP.addItem(item.ImeR);
-            RazredComboBoxO.addItem(item.ImeR);
+            RazredComboBoxP.addItem(item.getImeR());
+            RazredComboBoxO.addItem(item.getImeR());
         }
 
         RedovalnicaDatabase rd3 = new RedovalnicaDatabase();
         for (RazredPredmet item : rd3.ReturnVsePredmete()){
-            PredmetComboBoxP.addItem(item.ImeP);
-            PredmetComboBoxO.addItem(item.ImeP);
+            PredmetComboBoxP.addItem(item.getImeP());
+            PredmetComboBoxO.addItem(item.getImeP());
         }
 
         RedovalnicaDatabase rd4 = new RedovalnicaDatabase();
         for(Vrsta_Ur item : rd4.ReturnVseVrsteUr())
-            VrstaUrComboBox.addItem(item.Ura);
+            VrstaUrComboBox.addItem(item.getUra());
 
         RedovalnicaDatabase rd5 = new RedovalnicaDatabase();
         for(Ocena item : rd5.ReturnVseOcene())
-            OcenaComboBox.addItem(item.StO);
+            OcenaComboBox.addItem(item.getStO());
 
         RedovalnicaDatabase rt = new RedovalnicaDatabase();
         Razred r = new Razred(RazredComboBoxP.getSelectedItem().toString(), SolskoLetoComboBoxP.getSelectedItem().toString());
         for(Ucenec item: rt.ReturnUcenci_Razred(r)){
             DefaultTreeModel modelP2 = (DefaultTreeModel)PrisotnostTree.getModel();
             DefaultMutableTreeNode rootP2 = (DefaultMutableTreeNode)modelP2.getRoot();
-            rootP2.add(new DefaultMutableTreeNode(item.Ime + " " + item.Priimek));
+            rootP2.add(new DefaultMutableTreeNode(item.getIme() + " " + item.getPriimek()));
             modelP2.reload(rootP2);
 
             DefaultTreeModel modelO2 = (DefaultTreeModel)OcenaTree.getModel();
             DefaultMutableTreeNode rootO2 = (DefaultMutableTreeNode)modelO2.getRoot();
-            rootO2.add(new DefaultMutableTreeNode(item.Ime + " " + item.Priimek));
+            rootO2.add(new DefaultMutableTreeNode(item.getIme() + " " + item.getPriimek()));
             modelO2.reload(rootO2);
         }
         statistikaZaOceneButton.addActionListener(e -> {
@@ -200,7 +200,7 @@ public class App {
                 RedovalnicaDatabase s2 = new RedovalnicaDatabase();
                 Solsko_Leto sl2 = new Solsko_Leto(SolskoLetoComboBoxP.getSelectedItem().toString());
                 for(Razred item : s2.ReturnRazred_SolskoLeto(sl2))
-                    RazredComboBoxP.addItem(item.ImeR);
+                    RazredComboBoxP.addItem(item.getImeR());
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -211,7 +211,7 @@ public class App {
                 RedovalnicaDatabase s2 = new RedovalnicaDatabase();
                 Solsko_Leto sl2 = new Solsko_Leto(SolskoLetoComboBoxO.getSelectedItem().toString());
                 for(Razred item : s2.ReturnRazred_SolskoLeto(sl2))
-                    RazredComboBoxO.addItem(item.ImeR);
+                    RazredComboBoxO.addItem(item.getImeR());
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -225,9 +225,9 @@ public class App {
                 modelP2.reload();
                 Razred r2 = new Razred(RazredComboBoxP.getSelectedItem().toString(), SolskoLetoComboBoxP.getSelectedItem().toString());
                 for(Ucenec item: rc.ReturnUcenci_Razred(r2))
-                    if(item.Ime != "" && item.Priimek != "") {
-                        mankjkajociUcenci.add(item.Ime + ' ' + item.Priimek);
-                        UpdatePrisotnostJTree(item.Ime, item.Priimek);
+                    if(item.getIme() != "" && item.getPriimek() != "") {
+                        mankjkajociUcenci.add(item.getIme() + ' ' + item.getPriimek());
+                        UpdatePrisotnostJTree(item.getIme(), item.getPriimek());
                     }
             }catch (SQLException ex) {
                 ex.printStackTrace();
@@ -242,8 +242,8 @@ public class App {
                 rootO2.removeAllChildren();
                 modelO2.reload();
                 for(Ucenec item: rc.ReturnUcenci_Razred(r2))
-                    if(item.Ime != "" && item.Priimek != "")
-                        UpdateOcenaJTree(item.Ime, item.Priimek);
+                    if(item.getIme() != "" && item.getPriimek() != "")
+                        UpdateOcenaJTree(item.getIme(), item.getPriimek());
             }catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -283,8 +283,8 @@ public class App {
                     RedovalnicaDatabase rrp = new RedovalnicaDatabase();
                     /*for (Ucenec item : rrp.ReturnUcenci_Razred_Predmet_Vrsta_Ure_SolskoLeto_Datum(prisotnostZaNazaj))
                     {
-                        if (item.Ime != "" && item.Priimek != "")
-                            PrisotnostTreeView.Nodes[0].Nodes.Add(item.Ime + ' ' + item.Priimek);
+                        if (item.getIme() != "" && item.getPriimek() != "")
+                            PrisotnostTreeView.Nodes[0].Nodes.Add(item.getIme() + ' ' + item.getPriimek());
                     }*/
                 } catch (SQLException ex) {
                     ex.printStackTrace();
