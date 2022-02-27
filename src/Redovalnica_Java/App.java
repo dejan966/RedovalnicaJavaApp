@@ -40,8 +40,9 @@ public class App {
 
     static String sMail;
     static String imePriimekUcitelja;
-    ArrayList<String> mankjkajociUcenci = new ArrayList<String>();
-    String[] mU;
+    ArrayList<String> mankjkajociUcenci = new ArrayList<>();
+    ArrayList<String> razred = new ArrayList<>();
+    String[] mU, razredi;
 
     JDateChooser chooser = new JDateChooser();
     JDateChooser chooser2 = new JDateChooser();
@@ -105,9 +106,13 @@ public class App {
         }
         RedovalnicaDatabase s = new RedovalnicaDatabase();
         Solsko_Leto sl = new Solsko_Leto(SolskoLetoComboBoxP.getSelectedItem().toString());
-        for(Razred item : s.ReturnRazred_SolskoLeto(sl)){
-            RazredComboBoxP.addItem(item.getImeR());
-            RazredComboBoxO.addItem(item.getImeR());
+        for(Razred item : s.ReturnRazred_SolskoLeto(sl))
+            razred.add(item.getImeR());
+
+        for(int i = 0; i<razred.toArray().length; i++){
+            razredi = razred.toArray(new String[i]);
+            RazredComboBoxP.addItem(razredi[i]);
+            RazredComboBoxO.addItem(razredi[i]);
         }
 
         RedovalnicaDatabase rd3 = new RedovalnicaDatabase();
@@ -128,9 +133,9 @@ public class App {
         Razred r = new Razred(RazredComboBoxP.getSelectedItem().toString(), SolskoLetoComboBoxP.getSelectedItem().toString());
         for(Ucenec item: rt.ReturnUcenci_Razred(r)){
             DefaultTreeModel modelP2 = (DefaultTreeModel)PrisotnostTree.getModel();
-            DefaultMutableTreeNode rootP2 = (DefaultMutableTreeNode)modelP2.getRoot();
-            rootP2.add(new DefaultMutableTreeNode(item.getIme() + " " + item.getPriimek()));
-            modelP2.reload(rootP2);
+            DefaultMutableTreeNode rootPrisotnost = (DefaultMutableTreeNode)modelP2.getRoot();
+            rootPrisotnost.add(new DefaultMutableTreeNode(item.getIme() + " " + item.getPriimek()));
+            modelP2.reload(rootPrisotnost);
 
             DefaultTreeModel modelO2 = (DefaultTreeModel)OcenaTree.getModel();
             DefaultMutableTreeNode rootO2 = (DefaultMutableTreeNode)modelO2.getRoot();
@@ -195,18 +200,32 @@ public class App {
             }
         });
         SolskoLetoComboBoxP.addItemListener(e -> {
-            RazredComboBoxP.removeAllItems();
+            //RazredComboBoxP.removeAllItems();
+            //RazredComboBoxP.removeAll();
+            //RazredComboBoxP.getEditor().setItem("");
+            for(int i=RazredComboBoxP.getItemCount()-1;i>=0;i--){
+                RazredComboBoxP.removeItemAt(i);
+                razred.remove(i);
+            }
+//            DefaultComboBoxModel model = (DefaultComboBoxModel) RazredComboBoxP.getModel();
+//            model.removeAllElements();
             try {
                 RedovalnicaDatabase s2 = new RedovalnicaDatabase();
                 Solsko_Leto sl2 = new Solsko_Leto(SolskoLetoComboBoxP.getSelectedItem().toString());
-                for(Razred item : s2.ReturnRazred_SolskoLeto(sl2))
-                    RazredComboBoxP.addItem(item.getImeR());
+                for(Razred item : s2.ReturnRazred_SolskoLeto(sl2)){
+                    razred.add(item.getImeR());
+                    for(int i = 0; i<razred.toArray().length; i++){
+                        razredi = razred.toArray(new String[i]);
+                        RazredComboBoxP.addItem(razredi[i]);
+                    }
+                }
+
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
         });
         SolskoLetoComboBoxO.addItemListener(e -> {
-            RazredComboBoxO.removeAllItems();
+            //RazredComboBoxO.removeAllItems();
             try {
                 RedovalnicaDatabase s2 = new RedovalnicaDatabase();
                 Solsko_Leto sl2 = new Solsko_Leto(SolskoLetoComboBoxO.getSelectedItem().toString());
@@ -226,7 +245,7 @@ public class App {
                 Razred r2 = new Razred(RazredComboBoxP.getSelectedItem().toString(), SolskoLetoComboBoxP.getSelectedItem().toString());
                 for(Ucenec item: rc.ReturnUcenci_Razred(r2))
                     if(item.getIme() != "" && item.getPriimek() != "") {
-                        mankjkajociUcenci.add(item.getIme() + ' ' + item.getPriimek());
+                        mankjkajociUcenci.add(item.getIme() + " " + item.getPriimek());
                         UpdatePrisotnostJTree(item.getIme(), item.getPriimek());
                     }
             }catch (SQLException ex) {
