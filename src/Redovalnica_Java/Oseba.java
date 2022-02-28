@@ -280,10 +280,15 @@ class Vrsta_Ur
 class UreIzvedbe extends RazredPredmet{
     public int IdUr ;
     public int getIdUr(){return IdUr;}
+
     private String VrstaUre ;
     public String getVrstaUre(){return VrstaUre;}
+
     private String DatumCas ;
     public String getDatumCas(){return DatumCas;}
+
+    public String Datum;
+    public String getDatum(){return Datum;}
     public UreIzvedbe()
     {
 
@@ -298,12 +303,14 @@ class UreIzvedbe extends RazredPredmet{
         super(predmet, razred, sLeto);
         VrstaUre = vrstaure;
         DatumCas = datumCas;
+
     }
-    public UreIzvedbe(int id_razredi_predmeti, String vrsta_ure, String datumCas)
+    public UreIzvedbe(int id_razredi_predmeti, String vrsta_ure, String datumCas, String datum)
     {
         super(id_razredi_predmeti);
         VrstaUre = vrsta_ure;
         DatumCas = datumCas;
+        Datum = datum;
     }
     public UreIzvedbe(String predmet, String razred, String solsko_leto, String ucitelj, String vrstaure, String datumCas)
     {
@@ -333,5 +340,8 @@ class Prisotnost extends UreIzvedbe{
         super(id_ure_izvedbe);
         UcenecN = ucenec;
         Opomba = opomba;
+    }
+    public String _toString(){
+        return "Učenec: " + getUcenecN() + "\nId ure izvedbe: " + super.getIdUr() + "\nOpomba: " + getOpomba();
     }
 }

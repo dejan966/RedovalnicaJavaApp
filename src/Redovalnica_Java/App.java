@@ -41,8 +41,9 @@ public class App {
     static String sMail;
     static String imePriimekUcitelja;
     ArrayList<String> mankjkajociUcenci = new ArrayList<>();
-    ArrayList<String> razred = new ArrayList<>();
-    String[] mU, razredi;
+    String[] mU;
+    int ucenec = 0;
+    int sad = 0;
 
     JDateChooser chooser = new JDateChooser();
     JDateChooser chooser2 = new JDateChooser();
@@ -104,15 +105,13 @@ public class App {
             SolskoLetoComboBoxP.addItem(item.getSLeto());
             SolskoLetoComboBoxO.addItem(item.getSLeto());
         }
+
         RedovalnicaDatabase s = new RedovalnicaDatabase();
         Solsko_Leto sl = new Solsko_Leto(SolskoLetoComboBoxP.getSelectedItem().toString());
         for(Razred item : s.ReturnRazred_SolskoLeto(sl))
-            razred.add(item.getImeR());
-
-        for(int i = 0; i<razred.toArray().length; i++){
-            razredi = razred.toArray(new String[i]);
-            RazredComboBoxP.addItem(razredi[i]);
-            RazredComboBoxO.addItem(razredi[i]);
+        {
+            RazredComboBoxP.addItem(item.getImeR());
+            RazredComboBoxO.addItem(item.getImeR());
         }
 
         RedovalnicaDatabase rd3 = new RedovalnicaDatabase();
@@ -149,45 +148,41 @@ public class App {
         potrdiPrisotnostButton.addActionListener(e -> {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime now = LocalDateTime.now();
-            String Idate = dtf.format(now);
+            String datumCas = dtf.format(now);
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String Sdate = sdf.format(chooser.getDate());
+            String datum = sdf.format(chooser.getDate());
 
+            int idUreIzvedbR = 0, idRazredPredmetR = 0;
             if(SolskoLetoComboBoxP.getSelectedItem().toString() != "" && RazredComboBoxP.getSelectedItem().toString() != "" && PredmetComboBoxP.getSelectedItem().toString() != "" && VrstaUrComboBox.getSelectedItem().toString() != ""){
                 String opomba = textField1.getText();
                 try {
                     RedovalnicaDatabase rp = new RedovalnicaDatabase();
                     RazredPredmet razredPredmet = new RazredPredmet(PredmetComboBoxP.getSelectedItem().toString(), RazredComboBoxP.getSelectedItem().toString(), imePriimekUcitelja, SolskoLetoComboBoxP.getSelectedItem().toString());
-                    rp.InsertRazrediPredmeti(razredPredmet);
+                    if (rp.InsertRazrediPredmeti(razredPredmet) != 0) {
+                        RedovalnicaDatabase rp2 = new RedovalnicaDatabase();
+                        idRazredPredmetR = rp2.InsertRazrediPredmeti(razredPredmet);
+                    }
+                    //JOptionPane.showMessageDialog(null, idRazredPredmetR);
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
-                int idRazredPredmetR = 0;
-                try {
-                    RedovalnicaDatabase rp2 = new RedovalnicaDatabase();
-                    RazredPredmet idrazredPredmet = new RazredPredmet(PredmetComboBoxP.getSelectedItem().toString(), RazredComboBoxP.getSelectedItem().toString(), imePriimekUcitelja, SolskoLetoComboBoxP.getSelectedItem().toString());
-                    idRazredPredmetR = rp2.IDRazrediPredmeti(idrazredPredmet);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
+
                 try {
                     RedovalnicaDatabase ru = new RedovalnicaDatabase();
-                    UreIzvedbe ure = new UreIzvedbe(idRazredPredmetR, VrstaUrComboBox.getSelectedItem().toString(), Idate);
-                    ru.InsertUreIzvedb(ure);
+                    UreIzvedbe ure = new UreIzvedbe(idRazredPredmetR, VrstaUrComboBox.getSelectedItem().toString(), datumCas, datum);
+                    if(ru.InsertUreIzvedb(ure) != 0){
+                        RedovalnicaDatabase ru2 = new RedovalnicaDatabase();
+                        idUreIzvedbR = ru2.InsertUreIzvedb(ure);
+                    }
+                    //JOptionPane.showMessageDialog(null, idUreIzvedbR);
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
-                int idUreIzvedbR = 0;
-                try {
-                    RedovalnicaDatabase ru2 = new RedovalnicaDatabase();
-                    UreIzvedbe idure = new UreIzvedbe(idRazredPredmetR, VrstaUrComboBox.getSelectedItem().toString(), Sdate);
-                    idUreIzvedbR = ru2.IDUreIzvedb(idure);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-                /*for (int i = 0; i < mU.Length; i++)
+
+                for (int i = 0; i < mU.length; i++)
                 {
+                    JOptionPane.showMessageDialog(null, mU.length);
                     Prisotnost danasnjaPrisotnost = new Prisotnost(mU[i], idUreIzvedbR, opomba);
                     try {
                         RedovalnicaDatabase re = new RedovalnicaDatabase();
@@ -196,30 +191,27 @@ public class App {
                     } catch (SQLException ex) {
                         ex.printStackTrace();
                     }
-                }*/
+                }
             }
+            else
+                JOptionPane.showMessageDialog(null, "Morate vse izbrati");
         });
         SolskoLetoComboBoxP.addItemListener(e -> {
-            //RazredComboBoxP.removeAllItems();
+            RazredComboBoxP.removeAllItems();
             //RazredComboBoxP.removeAll();
             //RazredComboBoxP.getEditor().setItem("");
-            for(int i=RazredComboBoxP.getItemCount()-1;i>=0;i--){
-                RazredComboBoxP.removeItemAt(i);
-                razred.remove(i);
-            }
+//            for(int i=0;i<RazredComboBoxP.getItemCount()-1;i++){
+//                RazredComboBoxP.removeItemAt(i);
+//                //razred.remove(i);
+//            }
+
 //            DefaultComboBoxModel model = (DefaultComboBoxModel) RazredComboBoxP.getModel();
 //            model.removeAllElements();
             try {
                 RedovalnicaDatabase s2 = new RedovalnicaDatabase();
                 Solsko_Leto sl2 = new Solsko_Leto(SolskoLetoComboBoxP.getSelectedItem().toString());
-                for(Razred item : s2.ReturnRazred_SolskoLeto(sl2)){
-                    razred.add(item.getImeR());
-                    for(int i = 0; i<razred.toArray().length; i++){
-                        razredi = razred.toArray(new String[i]);
-                        RazredComboBoxP.addItem(razredi[i]);
-                    }
-                }
-
+                for(Razred item : s2.ReturnRazred_SolskoLeto(sl2))
+                    RazredComboBoxP.addItem(item.getImeR());
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -317,8 +309,10 @@ public class App {
                 //spremen barvo noda na rdečo
                 DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)PrisotnostTree.getSelectionPath().getLastPathComponent();
                 mankjkajociUcenci.remove(selectedNode.getUserObject().toString());
-                mU = mankjkajociUcenci.toArray(new String[1]);
-                JOptionPane.showMessageDialog(null, mU[1]);
+                mU = new String[ucenec+1];
+                mU = mankjkajociUcenci.toArray(new String[ucenec]);
+
+                ucenec++;
                 super.mouseClicked(e);
             }
         });
@@ -333,7 +327,7 @@ public class App {
             String node = (String) ((DefaultMutableTreeNode) value).getUserObject();
 
             // If the node is a leaf and ends with "xxx"
-            if (leaf && node.endsWith("xxx")) {
+            if (leaf && !node.endsWith(" ")) {
                 // Paint the node in blue
                 setForeground(new Color(13, 57 ,115));
             }

@@ -4,7 +4,7 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class RedovalnicaDatabase {
-    private Connection conn;
+    Connection conn;
     String jdbcURL = "jdbc:postgresql://ella.db.elephantsql.com:5432/finomhzd";
     String username = "finomhzd";
     String password = "qDjavv-S5TXm78zV2dGfIti1PiZZlcer";
@@ -245,68 +245,52 @@ public class RedovalnicaDatabase {
             throwables.printStackTrace();
         }
     }
-    public void InsertRazrediPredmeti(RazredPredmet rp)
+    public int InsertRazrediPredmeti(RazredPredmet rp)
     {
+        int id = 0;
         try(newConn){
-            Statement stmt = newConn.createStatement();
-            String sql = "SELECT p.predmet, r.razred, o.ime || ' ' || o.priimek FROM osebe o INNER JOIN ucitelji u on o.id_osebe = u.id_osebe INNER JOIN razredi_predmeti rp on u.id_ucitelji = rp.id_ucitelji INNER JOIN razredi r on rp.id_razredi = r.id_razredi INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta INNER JOIN predmeti p on rp.id_predmeti = p.id_predmeti WHERE (p.predmet = '" + rp.getImeP() + "') AND (r.razred = '" + rp.getImeR() + "') AND (sl.solsko_leto = '" + rp.getSLeto() + "') AND (ime || ' ' || priimek = '" + rp.getUciteljP() + "')";
-            ResultSet rs = stmt.executeQuery(sql);
+            Statement stmtSelect = newConn.createStatement();
+            String sqlSelect = "SELECT rp.id_razredi_predmeti FROM osebe o INNER JOIN ucitelji u on o.id_osebe = u.id_osebe INNER JOIN razredi_predmeti rp on u.id_ucitelji = rp.id_ucitelji INNER JOIN razredi r on rp.id_razredi = r.id_razredi INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta INNER JOIN predmeti p on rp.id_predmeti = p.id_predmeti WHERE (p.predmet = '" + rp.getImeP() + "') AND (r.razred = '" + rp.getImeR() + "') AND (sl.solsko_leto = '" + rp.getSLeto() + "') AND (ime || ' ' || priimek = '" + rp.getUciteljP() + "')";
+            ResultSet rs = stmtSelect.executeQuery(sqlSelect);
             if(rs.next()){
-                final Connection newConn2 = DriverManager.getConnection(jdbcURL, username, password);
-                Statement stmt2 = newConn2.createStatement();
-                String sql2 = "INSERT INTO razredi_predmeti (id_predmeti, id_razredi, id_ucitelji) VALUES ((SELECT id_predmeti FROM predmeti WHERE predmet = '" + rp.getImeP() + "'), (SELECT r.id_razredi FROM razredi r INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta WHERE (r.razred = '" + rp.getImeR() + "') AND (sl.solsko_leto = '" + rp.getSLeto() + "')), (SELECT id_ucitelji FROM ucitelji WHERE (id_osebe = (SELECT id_osebe FROM osebe WHERE ime || ' ' || priimek = '" + rp.getUciteljP() + "'))));";
-                stmt2.executeUpdate(sql2);
-                stmt2.close();
+                id = rs.getInt(1);
+            }
+            else{
+                Statement stmtInsert = newConn.createStatement();
+                String sqlInsert = "INSERT INTO razredi_predmeti (id_predmeti, id_razredi, id_ucitelji) VALUES ((SELECT id_predmeti FROM predmeti WHERE predmet = '" + rp.getImeP() + "'), (SELECT r.id_razredi FROM razredi r INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta WHERE (r.razred = '" + rp.getImeR() + "') AND (sl.solsko_leto = '" + rp.getSLeto() + "')), (SELECT id_ucitelji FROM ucitelji WHERE (id_osebe = (SELECT id_osebe FROM osebe WHERE ime || ' ' || priimek = '" + rp.getUciteljP() + "'))));";
+                stmtInsert.executeUpdate(sqlInsert);
+                stmtInsert.close();
             }
             rs.close();
-            stmt.close();
-        }
-        catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-    }
-    public int IDRazrediPredmeti(RazredPredmet rp)
-    {
-        int id = 1;
-        try(newConn){
-            Statement stmt = newConn.createStatement();
-            String sql = "SELECT id_razredi_predmeti FROM razredi_predmeti WHERE (id_predmeti = (SELECT id_predmeti FROM predmeti WHERE predmet = '" + rp.getImeP() + "')) AND (id_razredi = (SELECT r.id_razredi FROM razredi r INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta WHERE (r.razred = '\" + rp.getImeR() + \"') AND (sl.solsko_leto = '" + rp.getSLeto() + "'))) AND (id_ucitelji = (SELECT id_ucitelji FROM ucitelji WHERE (id_osebe = (SELECT id_osebe FROM osebe WHERE ime || ' ' || priimek = '" + rp.getUciteljP() + "'))));";
-            ResultSet rs = stmt.executeQuery(sql);
-            while(rs.next())
-                id = rs.getInt(1);
-
-            rs.close();
-            stmt.close();
+            stmtSelect.close();
         }
         catch (SQLException throwables) {
             throwables.printStackTrace();
         }
         return id;
     }
-    public void InsertUreIzvedb(UreIzvedbe ure)
+    public int InsertUreIzvedb(UreIzvedbe ure)
     {
+        int id = 0;
         try(newConn){
-            Statement stmt = newConn.createStatement();
-            String sql = "INSERT INTO ure_izvedb(id_razredi_predmeti, id_vrste_ur, datum_cas) VALUES ('" + ure.Id_R_P_U + "', (SELECT id_vrste_ur FROM vrste_ur WHERE vrsta_ure = '" + ure.getVrstaUre() + "'), '" + ure.getDatumCas() + "');";
-            stmt.executeUpdate(sql);
-            stmt.close();
+            Statement stmtSelect = newConn.createStatement();
+            String sqlSelect = "SELECT id_ure_izvedb FROM ure_izvedb WHERE (id_razredi_predmeti = '" + ure.Id_R_P_U + "') AND (id_vrste_ur = (SELECT id_vrste_ur FROM vrste_ur WHERE vrsta_ure = '" + ure.getVrstaUre() + "')) AND (datum_cas LIKE '%" + ure.getDatum() + "%')";
+            ResultSet rsSelect = stmtSelect.executeQuery(sqlSelect);
+            if(rsSelect.next()){
+                id = rsSelect.getInt(1);
+            }
+            else if(!rsSelect.next()){
+                Statement stmtInsert = newConn.createStatement();
+                String sqlInsert = "INSERT INTO ure_izvedb(id_razredi_predmeti, id_vrste_ur, datum_cas) VALUES ('" + ure.Id_R_P_U + "', (SELECT id_vrste_ur FROM vrste_ur WHERE vrsta_ure = '" + ure.getVrstaUre() + "'), '" + ure.getDatumCas() + "')";
+
+                stmtInsert.executeUpdate(sqlInsert);
+                stmtInsert.close();
+
+            }
+            rsSelect.close();
+            stmtSelect.close();
         }
         catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-    }
-    public int IDUreIzvedb(UreIzvedbe ure){
-        int id = 1;
-        try(newConn){
-            Statement stmt = newConn.createStatement();
-            String sql = "SELECT id_ure_izvedb FROM ure_izvedb WHERE (id_razredi_predmeti = '" + ure.Id_R_P_U + "') AND (id_vrste_ur = (SELECT id_vrste_ur FROM vrste_ur WHERE vrsta_ure = '" + ure.getVrstaUre() + "')) AND (datum_cas LIKE '%" + ure.getDatumCas() + "%');";
-            ResultSet rs = stmt.executeQuery(sql);
-            while(rs.next())
-                id = rs.getInt(1);
-            rs.close();
-            stmt.close();
-        }
-        catch (SQLException throwables){
             throwables.printStackTrace();
         }
         return id;
@@ -316,7 +300,7 @@ public class RedovalnicaDatabase {
         try(newConn)
         {
             Statement stmt = newConn.createStatement();
-            String sql = "INSERT INTO prisotnosti(id_ucenci, id_ure_izvedb, getOpomba()) VALUES((SELECT id_ucenci FROM ucenci WHERE (id_osebe = (SELECT id_osebe FROM osebe WHERE ime || ' ' || priimek = '" + dPrisotnost.getUcenecN() + "'))), '" + dPrisotnost.IdUr + "', '" + dPrisotnost.getOpomba() + "')";
+            String sql = "INSERT INTO prisotnosti(id_ucenci, id_ure_izvedb, opomba) VALUES((SELECT id_ucenci FROM ucenci WHERE (id_osebe = (SELECT id_osebe FROM osebe WHERE ime || ' ' || priimek = '" + dPrisotnost.getUcenecN() + "'))), '" + dPrisotnost.IdUr + "', '" + dPrisotnost.getOpomba() + "')";
             stmt.executeUpdate(sql);
             stmt.close();
         }
