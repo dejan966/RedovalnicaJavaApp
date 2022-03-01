@@ -44,7 +44,6 @@ public class App {
     static String imePriimekUcitelja;
     ArrayList<String> manjkajociUcenci = new ArrayList<>();
     String[] mU;
-    int ucenec = 0;
 
     JDateChooser chooserPrisotnost = new JDateChooser();
     JDateChooser chooserOcene = new JDateChooser();
@@ -231,7 +230,6 @@ public class App {
         });
         RazredComboBoxP.addItemListener(e -> {
             try{
-                int i = 0;
                 RedovalnicaDatabase rc = new RedovalnicaDatabase();
                 DefaultTreeModel modelP2 = (DefaultTreeModel)PrisotnostTree.getModel();
                 DefaultMutableTreeNode rootP2 = (DefaultMutableTreeNode)modelP2.getRoot();
@@ -239,21 +237,14 @@ public class App {
                 modelP2.reload();
                 Razred r2 = new Razred(RazredComboBoxP.getSelectedItem().toString(), SolskoLetoComboBoxP.getSelectedItem().toString());
                 for(Ucenec item: rc.ReturnUcenci_Razred(r2)) {
-                    if (item.getIme().equals("")  && item.getPriimek().equals("")) {
-                        //manjkajociUcenci.add(item.getIme() + " " + item.getPriimek());
-                        //mU[i] = new String[manjkajociUcenci.size()];
-                        mU[i] = item.getIme() + " " + item.getPriimek();
+                    if (item.getIme()!= ""  && item.getPriimek()!= "" ) {
+                        manjkajociUcenci.add(item.getIme() + " " + item.getPriimek());
+                        mU = manjkajociUcenci.toArray(new String[0]);
+
                         UpdatePrisotnostJTree(item.getIme(), item.getPriimek());
-                        i++;
-                        System.out.println(i);
                     }
 
                 }
-//                for (int i = 0; i < manjkajociUcenci.size(); i++) {
-//                    mU[i] = manjkajociUcenci.get(i);
-//                    System.out.println(mU[i]);
-//                }
-//                mU = manjkajociUcenci.toArray();
             }catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -267,7 +258,7 @@ public class App {
                 rootO2.removeAllChildren();
                 modelO2.reload();
                 for(Ucenec item: rc.ReturnUcenci_Razred(r2))
-                    if(item.getIme().equals("") && item.getPriimek().equals(""))
+                    if(item.getIme() != "" && item.getPriimek() != "")
                         UpdateOcenaJTree(item.getIme(), item.getPriimek());
             }catch (SQLException ex) {
                 ex.printStackTrace();
@@ -317,12 +308,7 @@ public class App {
                 //spremen barvo noda na rdečo
                 DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)PrisotnostTree.getSelectionPath().getLastPathComponent();
                 manjkajociUcenci .remove(selectedNode.getUserObject().toString());
-//                //mU = new String[ucenec+1];
-//                JOptionPane.showMessageDialog(null, manjkajociUcenci.size());
                 mU = manjkajociUcenci.toArray(new String[0]);
-//                mU[ucenec] = manjkajociUcenci.get(ucenec);
-                //System.out.println(manjkajociUcenci.size());
-                ucenec++;
                 super.mouseClicked(e);
             }
         });
