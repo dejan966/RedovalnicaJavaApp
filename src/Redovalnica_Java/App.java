@@ -57,6 +57,8 @@ public class App {
         DefaultTreeModel modelP = (DefaultTreeModel)PrisotnostTree.getModel();
         DefaultMutableTreeNode rootP = (DefaultMutableTreeNode)modelP.getRoot();
         rootP.add(new DefaultMutableTreeNode(ime + " " + priimek));
+        manjkajociUcenci.add(ime + " " + priimek);
+        mU = manjkajociUcenci.toArray(new String[0]);
         modelP.reload(rootP);
     }
     public void UpdateOcenaJTree(String ime, String priimek){
@@ -134,6 +136,7 @@ public class App {
             DefaultTreeModel modelP2 = (DefaultTreeModel)PrisotnostTree.getModel();
             DefaultMutableTreeNode rootPrisotnost = (DefaultMutableTreeNode)modelP2.getRoot();
             rootPrisotnost.add(new DefaultMutableTreeNode(item.getIme() + " " + item.getPriimek()));
+            manjkajociUcenci.add(item.getIme() + " " + item.getPriimek());
             modelP2.reload(rootPrisotnost);
 
             DefaultTreeModel modelO2 = (DefaultTreeModel)OcenaTree.getModel();
@@ -167,7 +170,6 @@ public class App {
                     RedovalnicaDatabase rp2 = new RedovalnicaDatabase();
                     idRazredPredmetR = rp2.InsertRazrediPredmeti(razredPredmet);
                 }
-                //JOptionPane.showMessageDialog(null, idRazredPredmetR);
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -179,14 +181,12 @@ public class App {
                     RedovalnicaDatabase ru2 = new RedovalnicaDatabase();
                     idUreIzvedbR = ru2.InsertUreIzvedb(ure);
                 }
-                //JOptionPane.showMessageDialog(null, idUreIzvedbR);
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
 
             for (int i = 0; i < mU.length; i++)
             {
-                JOptionPane.showMessageDialog(null, mU.length);
                 try {
                     Prisotnost danasnjaPrisotnost = new Prisotnost(mU[i], idUreIzvedbR, opomba);
                     RedovalnicaDatabase re = new RedovalnicaDatabase();
@@ -238,8 +238,13 @@ public class App {
                 Razred r2 = new Razred(RazredComboBoxP.getSelectedItem().toString(), SolskoLetoComboBoxP.getSelectedItem().toString());
                 for(Ucenec item: rc.ReturnUcenci_Razred(r2)) {
                     if (item.getIme()!= ""  && item.getPriimek()!= "" ) {
-                        manjkajociUcenci.add(item.getIme() + " " + item.getPriimek());
-                        mU = manjkajociUcenci.toArray(new String[0]);
+//                        manjkajociUcenci.add(item.getIme() + " " + item.getPriimek());
+//                        mU = manjkajociUcenci.toArray(new String[0]);
+
+                        if(!manjkajociUcenci.isEmpty()){
+                            for(int i = 1; i<manjkajociUcenci.size(); i++)
+                                manjkajociUcenci.remove(i);
+                        }
 
                         UpdatePrisotnostJTree(item.getIme(), item.getPriimek());
                     }
