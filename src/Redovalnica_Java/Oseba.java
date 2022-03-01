@@ -37,7 +37,7 @@ class Kraj extends Drzava{
         return "Kraj: " + getImeK() + "\nDržava: " + super.getDrzavaSlo();
     }
 }
-public class Oseba extends Kraj{
+class Oseba extends Kraj{
     private String Ime;
     public String getIme(){return Ime;}
     private String Priimek ;
