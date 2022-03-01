@@ -260,6 +260,15 @@ public class RedovalnicaDatabase {
                 String sqlInsert = "INSERT INTO razredi_predmeti (id_predmeti, id_razredi, id_ucitelji) VALUES ((SELECT id_predmeti FROM predmeti WHERE predmet = '" + rp.getImeP() + "'), (SELECT r.id_razredi FROM razredi r INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta WHERE (r.razred = '" + rp.getImeR() + "') AND (sl.solsko_leto = '" + rp.getSLeto() + "')), (SELECT id_ucitelji FROM ucitelji WHERE (id_osebe = (SELECT id_osebe FROM osebe WHERE ime || ' ' || priimek = '" + rp.getUciteljP() + "'))));";
                 stmtInsert.executeUpdate(sqlInsert);
                 stmtInsert.close();
+
+                Statement stmtSelect2 = newConn.createStatement();
+                String sqlSelect2 = "SELECT rp.id_razredi_predmeti FROM osebe o INNER JOIN ucitelji u on o.id_osebe = u.id_osebe INNER JOIN razredi_predmeti rp on u.id_ucitelji = rp.id_ucitelji INNER JOIN razredi r on rp.id_razredi = r.id_razredi INNER JOIN solska_leta sl ON sl.id_solska_leta = r.id_solska_leta INNER JOIN predmeti p on rp.id_predmeti = p.id_predmeti WHERE (p.predmet = '" + rp.getImeP() + "') AND (r.razred = '" + rp.getImeR() + "') AND (sl.solsko_leto = '" + rp.getSLeto() + "') AND (ime || ' ' || priimek = '" + rp.getUciteljP() + "')";
+                ResultSet rs2 = stmtSelect2.executeQuery(sqlSelect2);
+                while(rs2.next())
+                    id = rs2.getInt(1);
+
+                rs2.close();
+                stmtSelect2.close();
             }
             rs.close();
             stmtSelect.close();
@@ -279,13 +288,21 @@ public class RedovalnicaDatabase {
             if(rsSelect.next()){
                 id = rsSelect.getInt(1);
             }
-            else if(!rsSelect.next()){
+            else{
                 Statement stmtInsert = newConn.createStatement();
                 String sqlInsert = "INSERT INTO ure_izvedb(id_razredi_predmeti, id_vrste_ur, datum_cas) VALUES ('" + ure.Id_R_P_U + "', (SELECT id_vrste_ur FROM vrste_ur WHERE vrsta_ure = '" + ure.getVrstaUre() + "'), '" + ure.getDatumCas() + "')";
 
                 stmtInsert.executeUpdate(sqlInsert);
                 stmtInsert.close();
 
+                Statement stmtSelect2 = newConn.createStatement();
+                String sqlSelect2 = "SELECT id_ure_izvedb FROM ure_izvedb WHERE (id_razredi_predmeti = '" + ure.Id_R_P_U + "') AND (id_vrste_ur = (SELECT id_vrste_ur FROM vrste_ur WHERE vrsta_ure = '" + ure.getVrstaUre() + "')) AND (datum_cas LIKE '%" + ure.getDatum() + "%')";
+                ResultSet rsSelect2 = stmtSelect2.executeQuery(sqlSelect2);
+                while(rsSelect2.next())
+                    id = rsSelect2.getInt(1);
+
+                rsSelect2.close();
+                stmtSelect2.close();
             }
             rsSelect.close();
             stmtSelect.close();

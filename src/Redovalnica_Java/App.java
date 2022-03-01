@@ -166,10 +166,7 @@ public class App {
             try {
                 RedovalnicaDatabase rp = new RedovalnicaDatabase();
                 RazredPredmet razredPredmet = new RazredPredmet(PredmetComboBoxP.getSelectedItem().toString(), RazredComboBoxP.getSelectedItem().toString(), imePriimekUcitelja, SolskoLetoComboBoxP.getSelectedItem().toString());
-                if (rp.InsertRazrediPredmeti(razredPredmet) != 0) {
-                    RedovalnicaDatabase rp2 = new RedovalnicaDatabase();
-                    idRazredPredmetR = rp2.InsertRazrediPredmeti(razredPredmet);
-                }
+                idRazredPredmetR = rp.InsertRazrediPredmeti(razredPredmet);
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -177,10 +174,7 @@ public class App {
             try {
                 RedovalnicaDatabase ru = new RedovalnicaDatabase();
                 UreIzvedbe ure = new UreIzvedbe(idRazredPredmetR, VrstaUrComboBox.getSelectedItem().toString(), datumCas, datum);
-                if(ru.InsertUreIzvedb(ure) != 0){
-                    RedovalnicaDatabase ru2 = new RedovalnicaDatabase();
-                    idUreIzvedbR = ru2.InsertUreIzvedb(ure);
-                }
+                idUreIzvedbR = ru.InsertUreIzvedb(ure);
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -238,11 +232,8 @@ public class App {
                 Razred r2 = new Razred(RazredComboBoxP.getSelectedItem().toString(), SolskoLetoComboBoxP.getSelectedItem().toString());
                 for(Ucenec item: rc.ReturnUcenci_Razred(r2)) {
                     if (item.getIme()!= ""  && item.getPriimek()!= "" ) {
-//                        manjkajociUcenci.add(item.getIme() + " " + item.getPriimek());
-//                        mU = manjkajociUcenci.toArray(new String[0]);
-
                         if(!manjkajociUcenci.isEmpty()){
-                            for(int i = 1; i<manjkajociUcenci.size(); i++)
+                            for(int i = 0; i<manjkajociUcenci.size(); i++)
                                 manjkajociUcenci.remove(i);
                         }
 
