@@ -5,12 +5,11 @@ import com.toedter.calendar.JDateChooser;
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -43,6 +42,8 @@ public class App {
     static String sMail;
     static String imePriimekUcitelja;
     ArrayList<String> manjkajociUcenci = new ArrayList<>();
+    ArrayList<String> oceneUcenci = new ArrayList<>();
+    ArrayList<String> ocene = new ArrayList<>();
     String[] mU;
 
     JDateChooser chooserPrisotnost = new JDateChooser();
@@ -79,7 +80,6 @@ public class App {
         jCal.add(chooserPrisotnost);
         jCal2.add(chooserOcene);
 
-        potrdiPrisotnostButton.setEnabled(false);
         //removing the default child nodes from PrisotnostJtree
         DefaultTreeModel modelP = (DefaultTreeModel) PrisotnostTree.getModel();
         DefaultMutableTreeNode rootP = (DefaultMutableTreeNode) modelP.getRoot();
@@ -129,6 +129,8 @@ public class App {
         RedovalnicaDatabase rd5 = new RedovalnicaDatabase();
         for(Ocena item : rd5.ReturnVseOcene())
             OcenaComboBox.addItem(item.getStO());
+
+        ocene.add(OcenaComboBox.getSelectedItem().toString());
 
         RedovalnicaDatabase rt = new RedovalnicaDatabase();
         Razred r = new Razred(RazredComboBoxP.getSelectedItem().toString(), SolskoLetoComboBoxP.getSelectedItem().toString());
@@ -186,7 +188,7 @@ public class App {
                     RedovalnicaDatabase re = new RedovalnicaDatabase();
                     re.InsertPrisotnosti(danasnjaPrisotnost);
                     JOptionPane.showMessageDialog(null, "Uspešno dodana prisotnost za ta dan.", "Uspešno", JOptionPane.INFORMATION_MESSAGE);
-                } catch (SQLException ex) {
+                }catch (SQLException ex) {
                     ex.printStackTrace();
                 }
             }
@@ -263,19 +265,22 @@ public class App {
         vnesiOcenoButton.addActionListener(e -> {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             String Sdate = sdf.format(chooserOcene.getDate());
-
-            DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)OcenaTree.getSelectionPath().getLastPathComponent();
-            String ucenec = selectedNode.getUserObject().toString();
             try {
                 RedovalnicaDatabase rp = new RedovalnicaDatabase();
                 RazredPredmet razredPredmet = new RazredPredmet(PredmetComboBoxO.getSelectedItem().toString(), RazredComboBoxO.getSelectedItem().toString(), imePriimekUcitelja, SolskoLetoComboBoxO.getSelectedItem().toString());
                 rp.InsertRazrediPredmeti(razredPredmet);
 
-                RedovalnicaDatabase rs = new RedovalnicaDatabase();
-                Ocena ocena = new Ocena(ucenec, OcenaComboBox.getSelectedItem().toString(), Sdate, PredmetComboBoxO.getSelectedItem().toString(), RazredComboBoxO.getSelectedItem().toString(), SolskoLetoComboBoxO.getSelectedItem().toString(), imePriimekUcitelja);
-                rs.InsertOcena_Ucenec(ocena);
-            }catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "Ocene ni bilo mogoče dodati za ucenca " + ucenec + ".", "Error", JOptionPane.ERROR_MESSAGE);
+                for(int i = 0; i<oceneUcenci.size(); i++){
+                    RedovalnicaDatabase rs = new RedovalnicaDatabase();
+                    DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)OcenaTree.getSelectionPath().getLastPathComponent();
+                    //String ucenec = selectedNode.getUserObject().toString();
+                    Ocena ocena = new Ocena(oceneUcenci.get(i), ocene.get(i), Sdate, PredmetComboBoxO.getSelectedItem().toString(), RazredComboBoxO.getSelectedItem().toString(), SolskoLetoComboBoxO.getSelectedItem().toString(), imePriimekUcitelja);
+                    rs.InsertOcena_Ucenec(ocena);
+                }
+
+                JOptionPane.showMessageDialog(null, "Uspešno vnešene ocene.", "Uspešno", JOptionPane.INFORMATION_MESSAGE);
+            }catch(SQLException ex){
+                JOptionPane.showMessageDialog(null, "Interna napaka.", "Error", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             }
             });
@@ -303,10 +308,22 @@ public class App {
                 potrdiPrisotnostButton.setEnabled(true);
                 //spremen barvo noda na rdečo
                 DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)PrisotnostTree.getSelectionPath().getLastPathComponent();
-                manjkajociUcenci .remove(selectedNode.getUserObject().toString());
+                manjkajociUcenci.remove(selectedNode.getUserObject().toString());
                 mU = manjkajociUcenci.toArray(new String[0]);
                 super.mouseClicked(e);
             }
+        });
+        OcenaTree.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                vnesiOcenoButton.setEnabled(true);
+                DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)OcenaTree.getSelectionPath().getLastPathComponent();
+                oceneUcenci.add(selectedNode.getUserObject().toString());
+                super.mouseClicked(e);
+            }
+        });
+        OcenaComboBox.addItemListener(e -> {
+            ocene.add(OcenaComboBox.getSelectedItem().toString());
         });
     }
     public class MyTreeCellRenderer extends DefaultTreeCellRenderer {
