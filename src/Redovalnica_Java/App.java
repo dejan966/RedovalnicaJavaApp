@@ -132,6 +132,9 @@ public class App {
 
         ocene.add(OcenaComboBox.getSelectedItem().toString());
 
+        OcenaTree.setCellRenderer(new MyTreeCellRenderer());
+        PrisotnostTree.setCellRenderer(new MyTreeCellRenderer());
+
         RedovalnicaDatabase rt = new RedovalnicaDatabase();
         Razred r = new Razred(RazredComboBoxP.getSelectedItem().toString(), SolskoLetoComboBoxP.getSelectedItem().toString());
         for(Ucenec item: rt.ReturnUcenci_Razred(r)){
@@ -319,6 +322,7 @@ public class App {
                 vnesiOcenoButton.setEnabled(true);
                 DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)OcenaTree.getSelectionPath().getLastPathComponent();
                 oceneUcenci.add(selectedNode.getUserObject().toString());
+
                 super.mouseClicked(e);
             }
         });
@@ -326,22 +330,40 @@ public class App {
             ocene.add(OcenaComboBox.getSelectedItem().toString());
         });
     }
+//    public class MyTreeCellRenderer extends DefaultTreeCellRenderer {
+//        @Override
+//        public Component getTreeCellRendererComponent(JTree tree, Object value,
+//            boolean sel, boolean exp, boolean leaf, int row, boolean hasFocus) {
+//            super.getTreeCellRendererComponent(tree, value, sel, exp, leaf, row, hasFocus);
+//
+//            // Assuming you have a tree of Strings
+//            String node = (String) ((DefaultMutableTreeNode) value).getUserObject();
+//
+//            // If the node is a leaf and ends with "xxx"
+//            if (leaf && !node.endsWith(" ")) {
+//                // nastavljanje barve noda v rdečo
+//                setForeground(new Color(255, 0,0));
+//            }
+//            return this;
+//        }
+//    }
     public class MyTreeCellRenderer extends DefaultTreeCellRenderer {
         @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value,
-            boolean sel, boolean exp, boolean leaf, int row, boolean hasFocus) {
-            super.getTreeCellRendererComponent(tree, value, sel, exp, leaf, row, hasFocus);
-
-            // Assuming you have a tree of Strings
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            JComponent c = (JComponent)super.getTreeCellRendererComponent(tree, value, isSelected, expanded, leaf, row, hasFocus);
+            c.setOpaque(true);
+//            DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+//            MyData data = (MyData)node.getUserObject();
+//            if(data.isX()){
+//                c.setForeground(Color.blue);
+//                c.setBackground(Color.gray);
+//            }
             String node = (String) ((DefaultMutableTreeNode) value).getUserObject();
 
-            // If the node is a leaf and ends with "xxx"
-            if (leaf && !node.endsWith(" ")) {
-                // Paint the node in blue
-                setForeground(new Color(13, 57 ,115));
-            }
+            if (isSelected)
+                c.setForeground(new Color(255, 0,0));
 
-            return this;
+            return c;
         }
     }
 }
