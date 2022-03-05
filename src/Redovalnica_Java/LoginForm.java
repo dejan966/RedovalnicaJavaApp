@@ -26,12 +26,14 @@ public class LoginForm {
                 RedovalnicaDatabase rd = new RedovalnicaDatabase();
                 if(rd.PreveriPrijavo(uc)){
                     App.MailUcitelja(textField1.getText());
+                    JOptionPane.showMessageDialog(null, "Prijava uspešna.", "Uspešno", JOptionPane.INFORMATION_MESSAGE);
                     jframe.dispose();
                     new App();
                 }
                 else
                     JOptionPane.showMessageDialog(null, "Napačno geslo ali email.");
             } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "Interna napaka.", "Error", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             }
         });

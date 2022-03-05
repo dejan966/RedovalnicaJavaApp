@@ -5,10 +5,7 @@ import com.toedter.calendar.JDateChooser;
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -132,9 +129,6 @@ public class App {
 
         ocene.add(OcenaComboBox.getSelectedItem().toString());
 
-        OcenaTree.setCellRenderer(new MyTreeCellRenderer());
-        PrisotnostTree.setCellRenderer(new MyTreeCellRenderer());
-
         RedovalnicaDatabase rt = new RedovalnicaDatabase();
         Razred r = new Razred(RazredComboBoxP.getSelectedItem().toString(), SolskoLetoComboBoxP.getSelectedItem().toString());
         for(Ucenec item: rt.ReturnUcenci_Razred(r)){
@@ -153,6 +147,9 @@ public class App {
         Date date = new Date();
         chooserPrisotnost.setDate(date);
         chooserOcene.setDate(date);
+
+        OcenaTree.setCellRenderer(new SelectOcenaTreeCellRenderer());
+        PrisotnostTree.setCellRenderer(new SelectPrisotnostTreeCellRenderer());
 
         statistikaZaOceneButton.addActionListener(e -> {
             jframe.dispose();
@@ -195,6 +192,7 @@ public class App {
                     ex.printStackTrace();
                 }
             }
+            PrisotnostTree.clearSelection();
         });
         SolskoLetoComboBoxP.addItemListener(e -> {
             RazredComboBoxP.removeAllItems();
@@ -236,17 +234,16 @@ public class App {
                 modelP2.reload();
                 Razred r2 = new Razred(RazredComboBoxP.getSelectedItem().toString(), SolskoLetoComboBoxP.getSelectedItem().toString());
                 for(Ucenec item: rc.ReturnUcenci_Razred(r2)) {
-                    if (item.getIme()!= ""  && item.getPriimek()!= "" ) {
+                    if (!item.getIme().equals("")  && !item.getPriimek().equals("")) {
                         if(!manjkajociUcenci.isEmpty()){
                             for(int i = 0; i<manjkajociUcenci.size(); i++)
                                 manjkajociUcenci.remove(i);
                         }
-
                         UpdatePrisotnostJTree(item.getIme(), item.getPriimek());
                     }
-
                 }
             }catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "Interna napaka.", "Error", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             }
         });
@@ -259,7 +256,7 @@ public class App {
                 rootO2.removeAllChildren();
                 modelO2.reload();
                 for(Ucenec item: rc.ReturnUcenci_Razred(r2))
-                    if(item.getIme() != "" && item.getPriimek() != "")
+                    if(!item.getIme().equals("")  && !item.getPriimek().equals(""))
                         UpdateOcenaJTree(item.getIme(), item.getPriimek());
             }catch (SQLException ex) {
                 ex.printStackTrace();
@@ -275,8 +272,6 @@ public class App {
 
                 for(int i = 0; i<oceneUcenci.size(); i++){
                     RedovalnicaDatabase rs = new RedovalnicaDatabase();
-                    DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)OcenaTree.getSelectionPath().getLastPathComponent();
-                    //String ucenec = selectedNode.getUserObject().toString();
                     Ocena ocena = new Ocena(oceneUcenci.get(i), ocene.get(i), Sdate, PredmetComboBoxO.getSelectedItem().toString(), RazredComboBoxO.getSelectedItem().toString(), SolskoLetoComboBoxO.getSelectedItem().toString(), imePriimekUcitelja);
                     rs.InsertOcena_Ucenec(ocena);
                 }
@@ -286,6 +281,7 @@ public class App {
                 JOptionPane.showMessageDialog(null, "Interna napaka.", "Error", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             }
+            OcenaTree.clearSelection();
             });
         preveriPrisotnostZaNazajButton.addActionListener(e -> {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -308,22 +304,34 @@ public class App {
         PrisotnostTree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
                 potrdiPrisotnostButton.setEnabled(true);
-                //spremen barvo noda na rdečo
                 DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)PrisotnostTree.getSelectionPath().getLastPathComponent();
                 manjkajociUcenci.remove(selectedNode.getUserObject().toString());
                 mU = manjkajociUcenci.toArray(new String[0]);
-                super.mouseClicked(e);
+
+                TreePath path = PrisotnostTree.getPathForLocation(e.getX(), e.getY());
+                if (path == null){
+                    PrisotnostTree.clearSelection();
+                    potrdiPrisotnostButton.setEnabled(false);
+                }
             }
         });
         OcenaTree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
                 vnesiOcenoButton.setEnabled(true);
                 DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)OcenaTree.getSelectionPath().getLastPathComponent();
                 oceneUcenci.add(selectedNode.getUserObject().toString());
 
-                super.mouseClicked(e);
+                TreePath path = OcenaTree.getPathForLocation(e.getX(), e.getY());
+                //OcenaTree.getSelectionModel().setSelectionPath(path);
+                if (path == null){
+                    OcenaTree.clearSelection();
+                    vnesiOcenoButton.setEnabled(false);
+                }
+
             }
         });
         OcenaComboBox.addItemListener(e -> {
@@ -347,20 +355,34 @@ public class App {
 //            return this;
 //        }
 //    }
-    public class MyTreeCellRenderer extends DefaultTreeCellRenderer {
+    public class SelectPrisotnostTreeCellRenderer extends DefaultTreeCellRenderer {
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             JComponent c = (JComponent)super.getTreeCellRendererComponent(tree, value, isSelected, expanded, leaf, row, hasFocus);
             c.setOpaque(true);
-//            DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-//            MyData data = (MyData)node.getUserObject();
-//            if(data.isX()){
-//                c.setForeground(Color.blue);
-//                c.setBackground(Color.gray);
-//            }
+    //            DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+    //            MyData data = (MyData)node.getUserObject();
+    //            if(data.isX()){
+    //                c.setForeground(Color.blue);
+    //                c.setBackground(Color.gray);
+    //            }
             String node = (String) ((DefaultMutableTreeNode) value).getUserObject();
 
-            if (isSelected)
+            if (leaf && hasFocus || isSelected)
+                c.setForeground(new Color(255, 0,0));
+
+            return c;
+        }
+    }
+    public class SelectOcenaTreeCellRenderer extends DefaultTreeCellRenderer {
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            JComponent c = (JComponent)super.getTreeCellRendererComponent(tree, value, isSelected, expanded, leaf, row, hasFocus);
+            c.setOpaque(true);
+
+            String node = (String) ((DefaultMutableTreeNode) value).getUserObject();
+
+            if (leaf && hasFocus || isSelected)
                 c.setForeground(new Color(255, 0,0));
 
             return c;
