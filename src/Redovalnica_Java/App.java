@@ -168,7 +168,7 @@ public class App {
             try {
                 RedovalnicaDatabase rp = new RedovalnicaDatabase();
                 RazredPredmet razredPredmet = new RazredPredmet(PredmetComboBoxP.getSelectedItem().toString(), RazredComboBoxP.getSelectedItem().toString(), imePriimekUcitelja, SolskoLetoComboBoxP.getSelectedItem().toString());
-                idRazredPredmetR = rp.InsertRazrediPredmeti(razredPredmet);
+                idRazredPredmetR = rp.InsertSelectRazrediPredmeti(razredPredmet);
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -176,7 +176,7 @@ public class App {
             try {
                 RedovalnicaDatabase ru = new RedovalnicaDatabase();
                 UreIzvedbe ure = new UreIzvedbe(idRazredPredmetR, VrstaUrComboBox.getSelectedItem().toString(), datumCas, datum);
-                idUreIzvedbR = ru.InsertUreIzvedb(ure);
+                idUreIzvedbR = ru.InsertSelectUreIzvedb(ure);
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -195,13 +195,12 @@ public class App {
             PrisotnostTree.clearSelection();
         });
         SolskoLetoComboBoxP.addItemListener(e -> {
-            RazredComboBoxP.removeAllItems();
+            //RazredComboBoxP.removeAllItems();
             //RazredComboBoxP.removeAll();
             //RazredComboBoxP.getEditor().setItem("");
-//            for(int i=0;i<RazredComboBoxP.getItemCount()-1;i++){
-//                RazredComboBoxP.removeItemAt(i);
-//                //razred.remove(i);
-//            }
+            for(int i=0;i<RazredComboBoxP.getItemCount();i++)
+                RazredComboBoxP.removeItemAt(i);
+
 
 //            DefaultComboBoxModel model = (DefaultComboBoxModel) RazredComboBoxP.getModel();
 //            model.removeAllElements();
@@ -268,7 +267,7 @@ public class App {
             try {
                 RedovalnicaDatabase rp = new RedovalnicaDatabase();
                 RazredPredmet razredPredmet = new RazredPredmet(PredmetComboBoxO.getSelectedItem().toString(), RazredComboBoxO.getSelectedItem().toString(), imePriimekUcitelja, SolskoLetoComboBoxO.getSelectedItem().toString());
-                rp.InsertRazrediPredmeti(razredPredmet);
+                rp.InsertSelectRazrediPredmeti(razredPredmet);
 
                 for(int i = 0; i<oceneUcenci.size(); i++){
                     RedovalnicaDatabase rs = new RedovalnicaDatabase();
@@ -337,6 +336,7 @@ public class App {
         OcenaComboBox.addItemListener(e -> {
             ocene.add(OcenaComboBox.getSelectedItem().toString());
         });
+
     }
 //    public class MyTreeCellRenderer extends DefaultTreeCellRenderer {
 //        @Override

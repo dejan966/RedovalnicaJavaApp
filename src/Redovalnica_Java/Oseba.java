@@ -161,7 +161,7 @@ class Razred extends Solsko_Leto
 {
     private String ImeR ;
     public String getImeR(){return ImeR;}
-    public int St ;
+    private int St ;
     public int getSt(){return St;}
     public Razred()
     {
@@ -181,7 +181,7 @@ class Razred extends Solsko_Leto
     }
 }
 class RazredPredmet extends Razred{
-    public int Id_R_P_U ;
+    private int Id_R_P_U ;
     public int getId_R_P_U(){return Id_R_P_U;}
     private String ImeP ;
     public String getImeP(){return ImeP;}
@@ -278,7 +278,7 @@ class Vrsta_Ur
     }
 }
 class UreIzvedbe extends RazredPredmet{
-    public int IdUr ;
+    private int IdUr ;
     public int getIdUr(){return IdUr;}
 
     private String VrstaUre ;
@@ -287,7 +287,7 @@ class UreIzvedbe extends RazredPredmet{
     private String DatumCas ;
     public String getDatumCas(){return DatumCas;}
 
-    public String Datum;
+    private String Datum;
     public String getDatum(){return Datum;}
     public UreIzvedbe()
     {
